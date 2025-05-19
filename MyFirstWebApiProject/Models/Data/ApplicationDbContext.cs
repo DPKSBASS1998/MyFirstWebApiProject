@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using MyFirstWebApiProject.Models.Users;
-using MyFirstWebApiProject.Models.Products;
+using KBDTypeServer.Models.Products;
+using KBDTypeServer.Models.Users;
 
-namespace MyFirstWebApiProject.Data
+namespace KBDTypeServer.Models.Data
 {
     public class ApplicationDbContext : IdentityDbContext<User>
     {

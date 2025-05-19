@@ -2,13 +2,12 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using KBDTypeServer.Models.Data;
+using KBDTypeServer.Models.Users;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using MyFirstWebApiProject.Data;
-using MyFirstWebApiProject.Models.Users;
-using MyFirstWebApiProject.Services.DTOs;
 
-namespace MyFirstWebApiProject.Services
+namespace KBDTypeServer.Services
 {
     public interface IAuthService
     {

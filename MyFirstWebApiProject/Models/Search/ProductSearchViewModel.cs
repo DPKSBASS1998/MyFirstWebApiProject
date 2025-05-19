@@ -1,6 +1,6 @@
-﻿using MyFirstWebApiProject.Models.Products;
+﻿using KBDTypeServer.Models.Products;
 
-namespace MyFirstWebApiProject.Models.Search
+namespace KBDTypeServer.Models.Search
 {
     public class ProductSearchViewModel
     {

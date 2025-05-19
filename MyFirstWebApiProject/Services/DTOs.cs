@@ -1,7 +1,7 @@
 ﻿// src/Services/DTOs/AuthDtos.cs
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-namespace MyFirstWebApiProject.Services.DTOs
+namespace KBDTypeServer.Services
 {
     /// <summary>
     /// Модель для логіну

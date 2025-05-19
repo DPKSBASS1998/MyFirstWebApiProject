@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using KBDTypeServer.Models.Data;
+using KBDTypeServer.Models.Products;
 using Microsoft.EntityFrameworkCore;
-using MyFirstWebApiProject.Data;
-using MyFirstWebApiProject.Models.Products;
 
-namespace MyFirstWebApiProject.Services
+namespace KBDTypeServer.Services
 {
     /// <summary>
     /// Defines operations for querying and retrieving switch products.

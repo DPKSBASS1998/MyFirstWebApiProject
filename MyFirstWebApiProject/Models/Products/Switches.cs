@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace MyFirstWebApiProject.Models.Products
+namespace KBDTypeServer.Models.Products
 {
     /// <summary>
     /// Представляє механічний перемикач клавіатури.

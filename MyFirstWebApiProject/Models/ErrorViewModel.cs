@@ -1,4 +1,4 @@
-namespace MyFirstWebApiProject.Models
+namespace KBDTypeServer.Models
 {
     public class ErrorViewModel
     {

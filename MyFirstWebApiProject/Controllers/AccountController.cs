@@ -1,11 +1,10 @@
 ﻿// src/Controllers/AuthController.cs
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using MyFirstWebApiProject.Services;
-using MyFirstWebApiProject.Services.DTOs;
 using System.Security.Claims;
+using KBDTypeServer.Services;
 
-namespace MyFirstWebApiProject.Controllers
+namespace KBDTypeServer.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

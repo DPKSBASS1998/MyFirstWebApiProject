@@ -1,4 +1,7 @@
 using System.IO;
+using KBDTypeServer.Models.Data;
+using KBDTypeServer.Models.Users;
+using KBDTypeServer.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -6,9 +9,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
-using MyFirstWebApiProject.Data;
-using MyFirstWebApiProject.Models.Users;
-using MyFirstWebApiProject.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

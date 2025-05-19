@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace MyFirstWebApiProject.Models.Users
+namespace KBDTypeServer.Models.Users
 {
     public class User : IdentityUser
     {

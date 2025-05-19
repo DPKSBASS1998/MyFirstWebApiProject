@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace MyFirstWebApiProject.Models.Users
+namespace KBDTypeServer.Models.Users
 {
     public class Address
     {

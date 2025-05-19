@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
+using KBDTypeServer.Services;
 using Microsoft.AspNetCore.Mvc;
-using MyFirstWebApiProject.Services;  // де оголошені ISwitchService і SwitchFilterDto
 
-namespace MyFirstWebApiProject.Controllers
+namespace KBDTypeServer.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
