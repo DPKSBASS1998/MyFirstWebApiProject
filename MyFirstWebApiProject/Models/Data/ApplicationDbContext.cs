@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using MyFirstWebApiProject  .Models.Users;
-using MyFirstWebApiProject.Models.Products;  // Підключення моделей товарів
+using MyFirstWebApiProject.Models.Users;
+using MyFirstWebApiProject.Models.Products;
 
 namespace MyFirstWebApiProject.Data
 {
@@ -12,13 +12,25 @@ namespace MyFirstWebApiProject.Data
         {
         }
 
-        // Додавання таблиць для продуктів
-        public DbSet<Product> Products { get; set; }
-        public DbSet<KeyboardSwitch> Switches { get; set; }
-        public DbSet<Barebone> Barebones { get; set; }
-        public DbSet<Keyboard> Keyboards { get; set; }
-        public DbSet<Keycaps> Keycaps { get; set; }
+        // Продукти
+        public DbSet<Switches> Switches { get; set; }
 
-        // Інші DbSet, якщо потрібно
+        // Адреси для користувачів
+        public DbSet<Address> Addresses { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+
+            // Налаштувати one-to-one між User і Address
+            builder.Entity<User>()
+                   .HasOne(u => u.Address)
+                   .WithOne(a => a.User)
+                   .HasForeignKey<Address>(a => a.UserId)
+                   .OnDelete(DeleteBehavior.Cascade);
+
+            // Якщо потрібні додаткові конфігурації моделей продуктів,
+            // їх також можна прописати тут.
+        }
     }
 }

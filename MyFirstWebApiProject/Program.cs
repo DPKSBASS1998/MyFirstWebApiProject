@@ -1,7 +1,14 @@
+using System.IO;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Hosting;
 using MyFirstWebApiProject.Data;
 using MyFirstWebApiProject.Models.Users;
+using MyFirstWebApiProject.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,27 +25,48 @@ builder.Services.AddIdentity<User, IdentityRole>()
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddScoped<ISwitchService, SwitchService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 // Налаштування CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend",
-        policy => policy.WithOrigins("http://localhost:3000") // Тут вказуємо правильний URL вашого фронтенду
-                        .AllowAnyMethod()
-                        .AllowAnyHeader()
-                        .AllowCredentials()); // Додано AllowCredentials для підтримки cookie
+        policy => policy
+            .WithOrigins("http://localhost:3000")
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials());
 });
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Cookie.HttpOnly = true;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest; // Це дозволить роботу на локальному сервері з HTTP
+    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
     options.SlidingExpiration = true;
 });
 
-
-
 var app = builder.Build();
+
+// Роздача статичних файлів з wwwroot
+app.UseStaticFiles();
+
+// Підключення зовнішньої папки "assets" як статичної
+// Використовуємо абсолютний шлях до папки, де фізично зберігаються зображення
+var assetFolderPath = @"C:\Users\bvivl\Documents\ПРоектування інтерфейсу\my-app\src\assets";
+if (Directory.Exists(assetFolderPath))
+{
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = new PhysicalFileProvider(assetFolderPath),
+        RequestPath = "/assets"
+    });
+}
+else
+{
+    // Приклад додаткового логування або обробки помилки
+    Console.WriteLine($"Warning: Assets folder not found at {assetFolderPath}");
+}
 
 if (app.Environment.IsDevelopment())
 {
