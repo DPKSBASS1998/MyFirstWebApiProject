@@ -1,14 +1,13 @@
-using System.IO;
-using KBDTypeServer.Models.Data;
-using KBDTypeServer.Models.Users;
-using KBDTypeServer.Services;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
+using KBDTypeServer.Application.Interfaces;
+using KBDTypeServer.Domain.Entities;
+using KBDTypeServer.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.Hosting;
+using KBDTypeServer.WebApi.Mapping;
+using KBDTypeServer.Infrastructure.Services.UserServices;
+using KBDTypeServer.Infrastructure.Services.SwitchServices;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +26,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<ISwitchService, SwitchService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IAddressService, AddressService>();
+builder.Services.AddScoped<IUserProfileService, UserProfileService>();
+builder.Services.AddAutoMapper(typeof(MappingProfile)); // якщо файл в WebApi
+
 
 // Налаштування CORS
 builder.Services.AddCors(options =>
@@ -42,31 +45,11 @@ builder.Services.AddCors(options =>
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Cookie.HttpOnly = true;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
     options.SlidingExpiration = true;
 });
 
 var app = builder.Build();
-
-// Роздача статичних файлів з wwwroot
-app.UseStaticFiles();
-
-// Підключення зовнішньої папки "assets" як статичної
-// Використовуємо абсолютний шлях до папки, де фізично зберігаються зображення
-var assetFolderPath = @"C:\Users\bvivl\Documents\ПРоектування інтерфейсу\my-app\src\assets";
-if (Directory.Exists(assetFolderPath))
-{
-    app.UseStaticFiles(new StaticFileOptions
-    {
-        FileProvider = new PhysicalFileProvider(assetFolderPath),
-        RequestPath = "/assets"
-    });
-}
-else
-{
-    // Приклад додаткового логування або обробки помилки
-    Console.WriteLine($"Warning: Assets folder not found at {assetFolderPath}");
-}
 
 if (app.Environment.IsDevelopment())
 {
@@ -79,5 +62,9 @@ app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.UseDefaultFiles();
+app.UseStaticFiles();
+app.MapFallbackToFile("index.html");
+
 
 app.Run();

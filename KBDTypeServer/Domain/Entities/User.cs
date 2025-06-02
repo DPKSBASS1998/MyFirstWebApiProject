@@ -1,0 +1,11 @@
+﻿using Microsoft.AspNetCore.Identity;
+
+namespace KBDTypeServer.Domain.Entities
+{
+    public class User : IdentityUser
+    {
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public Address Address { get; set; }
+    }
+}
