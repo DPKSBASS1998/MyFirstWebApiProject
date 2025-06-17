@@ -1,12 +1,12 @@
-using KBDTypeServer.Application.Interfaces;
-using KBDTypeServer.Domain.Entities;
+using KBDTypeServer.Application;
 using KBDTypeServer.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using KBDTypeServer.WebApi.Mapping;
-using KBDTypeServer.Infrastructure.Services.UserServices;
-using KBDTypeServer.Infrastructure.Services.SwitchServices;
+using System.Text.Json;
+using KBDTypeServer.Infrastructure.Repositories.OrderRepositories;
+using KBDTypeServer.Domain.Entities.UserEntity;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,23 +15,46 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Додавання Identity
-builder.Services.AddIdentity<User, IdentityRole>()
-    .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddDefaultTokenProviders();
-
 // Інші сервіси
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+    }); ;
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddScoped<ISwitchService, SwitchService>();
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IAddressService, AddressService>();
-builder.Services.AddScoped<IUserProfileService, UserProfileService>();
+/// <summary>
+/// <!-- Додавання сервісів -->-->
+/// </summary>
+
+/// <summary>
+/// <!-- Додавання репозиторіїв -->-->
+/// </summary>
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+
+/// <summary>
+/// <!-- Додавання AutoMapper -->-->
+/// </summary>
 builder.Services.AddAutoMapper(typeof(MappingProfile)); // якщо файл в WebApi
 
+/// <summary>
+/// Налаштування Identity
+/// </summary>
+builder.Services.AddIdentity<User, IdentityRole>(options =>
+{
+    options.Password.RequireDigit = false;
+    options.Password.RequiredLength = 1;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequiredUniqueChars = 0;
+})
+.AddEntityFrameworkStores<ApplicationDbContext>()
+.AddDefaultTokenProviders();
 
-// Налаштування CORS
+/// <summary>
+/// Налаштування CORS
+/// </summary>
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend",
@@ -42,6 +65,9 @@ builder.Services.AddCors(options =>
             .AllowCredentials());
 });
 
+/// <summary>
+/// Налаштування кукі для автентифікації
+/// </summary>
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Cookie.HttpOnly = true;
@@ -62,9 +88,14 @@ app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-app.UseDefaultFiles();
-app.UseStaticFiles();
-app.MapFallbackToFile("index.html");
+
+if (app.Environment.IsProduction())
+{
+    app.UseDefaultFiles();
+    app.UseStaticFiles();
+    app.MapFallbackToFile("index.html");
+}
+
 
 
 app.Run();

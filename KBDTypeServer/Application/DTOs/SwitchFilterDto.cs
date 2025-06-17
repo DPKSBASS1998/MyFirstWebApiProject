@@ -18,22 +18,22 @@
         public int? MaxOperatingForce { get; set; }
 
         /// <summary>Мінімальна повна відстань ходу (моделі).</summary>
-        public int? MinTotalTravel { get; set; }
+        public double? MinTotalTravel { get; set; }
 
         /// <summary>Максимальна повна відстань ходу (моделі).</summary>
-        public int? MaxTotalTravel { get; set; }
+        public double? MaxTotalTravel { get; set; }
 
         /// <summary>Мінімальний попередній хід.</summary>
-        public int? MinPreTravel { get; set; }
+        public double? MinPreTravel { get; set; }
 
         /// <summary>Максимальний попередній хід.</summary>
-        public int? MaxPreTravel { get; set; }
+        public double? MaxPreTravel { get; set; }
 
         /// <summary>Мінімальна позиція тактильного bump.</summary>
-        public int? MinTactilePosition { get; set; }
+        public double? MinTactilePosition { get; set; }
 
         /// <summary>Максимальна позиція тактильного bump.</summary>
-        public int? MaxTactilePosition { get; set; }
+        public double? MaxTactilePosition { get; set; }
 
         /// <summary>Мінімальна сила тактильного bump.</summary>
         public int? MinTactileForce { get; set; }
