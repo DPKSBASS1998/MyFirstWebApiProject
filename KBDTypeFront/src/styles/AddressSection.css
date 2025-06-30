@@ -1,0 +1,95 @@
+.address-section {
+  margin-top: 1.5rem;
+}
+
+.address-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.address-label {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--color-text);
+}
+
+.add-address-btn,
+.toggle-addresses-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.add-address-btn i,
+.toggle-addresses-btn i {
+  font-size: 1.2rem;
+  color: var(--color-text);
+}
+
+.add-address-btn:hover i,
+.toggle-addresses-btn:hover i {
+  color: var(--color-accent);
+}
+
+.addresses-dropdown {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: var(--color-bg);
+  max-height: 240px;
+  overflow-y: auto;
+  padding: 0.5rem;
+}
+
+.address-block {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 0.5rem;
+  border-bottom: 1px solid #eee;
+}
+.address-block:last-child {
+  border-bottom: none;
+}
+
+.address-info p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-text);
+  line-height: 1.2;
+}
+
+.address-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.edit-btn,
+.delete-btn {
+  background: transparent;
+  border: none;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  transition: background-color 0.2s, color 0.2s;
+  color: var(--color-text);
+}
+
+.edit-btn:hover,
+.delete-btn:hover {
+  color: var(--color-primary);
+}
+
+.address-block.selected {
+    border-radius: 8px;
+    border: 2px solid var(--color-accent);
+    box-shadow: 0 2px 8px 0 rgba(0, 123, 255, 0.08);
+}

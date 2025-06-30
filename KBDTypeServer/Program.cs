@@ -1,14 +1,21 @@
-using System.IO;
-using KBDTypeServer.Models.Data;
-using KBDTypeServer.Models.Users;
-using KBDTypeServer.Services;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
+using KBDTypeServer.Application;
+using KBDTypeServer.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.Hosting;
+using System.Text.Json;
+using KBDTypeServer.Infrastructure.Repositories.OrderRepositories;
+using KBDTypeServer.Infrastructure.Repositories.ProductRepositories;
+using KBDTypeServer.Infrastructure.Repositories.UserRepositories;
+using KBDTypeServer.Infrastructure.Repositories.AddressesRepositories;
+using KBDTypeServer.Infrastructure.Repositories.CartItemRepositories;
+using KBDTypeServer.Infrastructure.Repositories.WishListRepositories;
+using KBDTypeServer.Application.Services.AuthServices;
+using KBDTypeServer.Application.Services.UserServices;
+using KBDTypeServer.Application.Services.AddressService;
+using KBDTypeServer.Domain.Entities.UserEntity;
+using KBDTypeServer.Application.Mapping;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,19 +23,55 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Додавання Identity
-builder.Services.AddIdentity<User, IdentityRole>()
-    .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddDefaultTokenProviders();
-
 // Інші сервіси
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+    }); ;
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddScoped<ISwitchService, SwitchService>();
+/// <summary>
+/// <!-- Додавання сервісів -->-->
+/// </summary>
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserProfileService, UserProfileService>();
+builder.Services.AddScoped<IAddressService, AddressService>();
 
-// Налаштування CORS
+/// <summary>
+/// <!-- Додавання репозиторіїв -->-->
+/// </summary>
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
+builder.Services.AddScoped<IAddressRepository, AddressRepository>();
+builder.Services.AddScoped<ICartItemRepository, CartItemRepository>();
+builder.Services.AddScoped<IWishListRepository, WishListRepository>();
+
+/// <summary>
+/// <!-- Додавання AutoMapper -->-->
+/// </summary>
+builder.Services.AddAutoMapper(typeof(KBDTypeServer.Application.Mapping.MappingProfile));
+
+
+/// <summary>
+/// Налаштування Identity
+/// </summary>
+builder.Services.AddIdentity<User, IdentityRole<int>>(options =>
+{
+    options.Password.RequireDigit = false;
+    options.Password.RequiredLength = 1;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequiredUniqueChars = 0;
+})
+.AddEntityFrameworkStores<ApplicationDbContext>()
+.AddDefaultTokenProviders();
+
+/// <summary>
+/// Налаштування CORS
+/// </summary>
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend",
@@ -39,34 +82,17 @@ builder.Services.AddCors(options =>
             .AllowCredentials());
 });
 
+/// <summary>
+/// Налаштування кукі для автентифікації
+/// </summary>
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Cookie.HttpOnly = true;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
     options.SlidingExpiration = true;
 });
 
 var app = builder.Build();
-
-// Роздача статичних файлів з wwwroot
-app.UseStaticFiles();
-
-// Підключення зовнішньої папки "assets" як статичної
-// Використовуємо абсолютний шлях до папки, де фізично зберігаються зображення
-var assetFolderPath = @"C:\Users\bvivl\Documents\ПРоектування інтерфейсу\my-app\src\assets";
-if (Directory.Exists(assetFolderPath))
-{
-    app.UseStaticFiles(new StaticFileOptions
-    {
-        FileProvider = new PhysicalFileProvider(assetFolderPath),
-        RequestPath = "/assets"
-    });
-}
-else
-{
-    // Приклад додаткового логування або обробки помилки
-    Console.WriteLine($"Warning: Assets folder not found at {assetFolderPath}");
-}
 
 if (app.Environment.IsDevelopment())
 {
@@ -79,5 +105,14 @@ app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
+if (app.Environment.IsProduction())
+{
+    app.UseDefaultFiles();
+    app.UseStaticFiles();
+    app.MapFallbackToFile("index.html");
+}
+
+
 
 app.Run();

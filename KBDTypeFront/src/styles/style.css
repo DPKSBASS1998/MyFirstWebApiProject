@@ -1,0 +1,36 @@
+:root {
+  --color-primary: #ef7137;
+  --color-accent: #FFA040;
+  --color-hover-bg-dark: rgba(156, 154, 154, 0.2);
+  --color-hover-bg-light: rgba(255, 255, 255, 0.279);
+  --color-text: #212121;
+  --color-bg: #ffffff;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+button,
+i,
+.btn,
+.icon-button,
+.password-toggle-icon {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  caret-color: transparent;
+}
+

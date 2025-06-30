@@ -1,0 +1,137 @@
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    backdrop-filter: blur(8px);
+    background-color: rgba(0, 0, 0, 0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .cart-modal {
+    background: white;
+    width: 66vw;
+    height: 90vh;
+    border-radius: 12px;
+    padding: 2rem;
+    position: relative;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 1.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .cart-items {
+    flex-grow: 1;
+    margin-top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .cart-item {
+    display: flex;
+    align-items: center;
+    background: #f8f8f8;
+    border-radius: 8px;
+    padding: 0.75rem;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+    position: relative;
+  }
+  
+  .cart-item img {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-right: 1rem;
+  }
+  
+  .item-info h4 {
+    margin: 0;
+    font-size: 1rem;
+  }
+  
+  .item-info p {
+    margin: 0.2rem 0 0;
+    color: #666;
+    font-size: 0.9rem;
+  }
+  
+  .bi-x-lg{
+    color: var(--color-text);
+    cursor: pointer;
+  }
+
+  .remove-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: none;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  .remove-btn:hover, .bi-x-lg:hover{
+    color: var(--color-primary);
+  }
+  
+  .cart-footer {
+    border-top: 1px solid #ddd;
+    padding-top: 1rem;
+    margin-top: 1rem;
+    text-align: right;
+  }
+  
+  .checkout-btn {
+    background-color: var(--color-primary);
+    color: white;
+    padding: 0.6rem 1.2rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  
+  .quantity-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.quantity-control button {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: var(--color-primary);
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.quantity-control span {
+  min-width: 24px;
+  text-align: center;
+}
+
+.cart-actions {
+  margin-left: auto;        
+  margin-right: 5rem;     
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
