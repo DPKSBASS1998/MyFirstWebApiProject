@@ -15,7 +15,7 @@ import ProfileForm from "../components/ProfileForm";
 import AddressSection from "../components/AddressSection";
 import OrderSummary from "../components/OrderSummary";
 import "../styles/AccountShared.css";   
-import type { ProfileDto } from "../dto/profile/ProfileDto";
+import type { ProfileDto } from "../dto/profile/UserProfileDto";
 import type { AddressDto } from "../dto/address/AddressDto";
 import type { CartItem } from "../store/cartSlice";
 import { useIsAuthenticated } from "../hooks/useAuth";

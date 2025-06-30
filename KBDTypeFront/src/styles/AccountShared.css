@@ -215,8 +215,31 @@
 /* Стилі кнопок "Зберегти" та "Скасувати" (успадковані з .save-btn та .logout-btn) */
 /* Якщо потрібні додаткові відмінності, можна уточнити тут. */
 
+.profile-legend {
+  display: flex;
+  align-items: center;
+  gap: 40rem; /* для невеликого відступу між текстом і кнопкою */
+}
 
+.profile-legend-title {
+  flex: 1;
+  text-align: left;
+}
 
+.edit-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 4px;
+  font-size: 1em;
+  color: #444;
+  transition: color 0.15s;
+}
+
+.edit-btn:hover,
+.edit-btn:focus {
+  color: #1976d2;
+}
 
 /* Mobile responsive */
 @media (max-width: 600px) {

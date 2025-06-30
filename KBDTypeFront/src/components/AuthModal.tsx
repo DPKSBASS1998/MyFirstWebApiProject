@@ -2,18 +2,17 @@
 import React, { useState } from "react";
 import { useLogin, useRegister } from "../hooks/useAuth";
 import type { LoginDto } from "../dto/auth/LoginDto";
-import type { RegisterDto } from "../dto/auth/RegisterDto";
+import type { RegisterDto } from "../dto/auth/RegistrationDto/";
 import "../styles/AuthModal.css";
 
-const initialLoginState: LoginDto = { email: "", password: "", rememberMe: false };
+// Оновлені початкові стани згідно з DTO
+const initialLoginState: LoginDto = { identifier: "", password: "", rememberMe: false };
 const initialRegisterState: RegisterDto = {
   firstName: "",
   lastName: "",
   phoneNumber: "",
   email: "",
   password: "",
-  confirmPassword: "",
-  assignAsManager: false,
 };
 
 type Mode = "login" | "register";
@@ -26,7 +25,7 @@ export default function AuthModal({ onClose }: AuthModalProps) {
   const login = useLogin();
   const register = useRegister();
   const [mode, setMode] = useState<Mode>("login");
-  const [form, setForm] = useState<LoginDto | RegisterDto>(initialLoginState);
+  const [form, setForm] = useState<LoginDto | (RegisterDto & { confirmPassword?: string })>(initialLoginState);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -44,17 +43,19 @@ export default function AuthModal({ onClose }: AuthModalProps) {
 
     try {
       if (mode === "register") {
-        const regForm = form as RegisterDto;
+        const regForm = form as RegisterDto & { confirmPassword?: string };
 
-        const phoneRegex = /^\+380\d{9}$/;
+        const phoneRegex = /^380\d{9}$/;
         if (!phoneRegex.test(regForm.phoneNumber)) {
-          return setError("Телефон у форматі +380XXXXXXXXX");
+          return setError("Телефон у форматі 380XXXXXXXXX");
         }
         if (regForm.password !== regForm.confirmPassword) {
           return setError("Паролі не співпадають");
         }
 
-        await register(regForm);
+        // Відправляємо тільки поля RegisterDto
+        const { confirmPassword, ...registerDto } = regForm;
+        await register(registerDto as RegisterDto);
       } else {
         const loginForm = form as LoginDto;
         await login(loginForm);
@@ -71,6 +72,7 @@ export default function AuthModal({ onClose }: AuthModalProps) {
       <div className="auth-modal" onClick={(e) => e.stopPropagation()}>
         <button className="close-btn" onClick={onClose}>&times;</button>
 
+        {/* --- Блок перемикача вкладок (Вхід/Реєстрація) --- */}
         <div className="tabs">
           <button
             className={mode === "login" ? "active" : ""}
@@ -95,6 +97,7 @@ export default function AuthModal({ onClose }: AuthModalProps) {
         </div>
 
         <form className="auth-form" onSubmit={handleSubmit}>
+          {/* --- Блок реєстрації --- */}
           {mode === "register" && (
             <>
               <input
@@ -116,27 +119,45 @@ export default function AuthModal({ onClose }: AuthModalProps) {
               <input
                 name="phoneNumber"
                 type="tel"
-                placeholder="Телефон (+380XXXXXXXXX)"
+                placeholder="Телефон (380XXXXXXXXX)"
                 value={(form as RegisterDto).phoneNumber}
                 onChange={handleChange}
                 required
               />
+              <input
+                name="email"
+                type="email"
+                placeholder="Email"
+                value={(form as RegisterDto).email ?? ""}
+                onChange={handleChange}
+              />
             </>
           )}
 
-          <input name="email" type="email" placeholder="Email" value={form.email} onChange={handleChange} required />
+          {/* --- Блок входу --- */}
+          {mode === "login" && (
+            <input
+              name="identifier"
+              type="text"
+              placeholder="Email або номер телефону"
+              value={(form as LoginDto).identifier}
+              onChange={handleChange}
+              required
+            />
+          )}
 
+          {/* --- Блок пароля (загальний для обох режимів) --- */}
           <div className="password-wrapper">
             <input
               name="password"
               type={showPassword ? "text" : "password"}
               placeholder="Пароль"
-              value={form.password}
+              value={mode === "register"
+                ? (form as RegisterDto).password
+                : (form as LoginDto).password}
               onChange={handleChange}
               required
               autoComplete={mode === "register" ? "new-password" : "current-password"}
-              pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{6,}"
-              title="Мінімум 6 символів, одна велика й одна мала літера, цифра, спецсимвол"
             />
             <i
               className={`bi ${showPassword ? "bi-eye" : "bi-eye-slash"} password-toggle-icon`}
@@ -146,7 +167,7 @@ export default function AuthModal({ onClose }: AuthModalProps) {
             />
           </div>
 
-          {/* Чекбокс для rememberMe тільки для логіну */}
+          {/* --- Чекбокс "Запам'ятати мене" тільки для входу --- */}
           {mode === "login" && (
             <label className="remember-me-label" style={{ display: "flex", alignItems: "center", gap: 8, margin: "8px 0" }}>
               <input
@@ -159,6 +180,7 @@ export default function AuthModal({ onClose }: AuthModalProps) {
             </label>
           )}
 
+          {/* --- Підтвердження пароля та підказка тільки для реєстрації --- */}
           {mode === "register" && (
             <>
               <p className="password-hint">
@@ -168,7 +190,7 @@ export default function AuthModal({ onClose }: AuthModalProps) {
                 name="confirmPassword"
                 type="password"
                 placeholder="Підтвердження пароля"
-                value={(form as RegisterDto).confirmPassword}
+                value={(form as any).confirmPassword ?? ""}
                 onChange={handleChange}
                 required
                 autoComplete="new-password"
@@ -176,8 +198,10 @@ export default function AuthModal({ onClose }: AuthModalProps) {
             </>
           )}
 
+          {/* --- Відображення помилки --- */}
           {error && <p className="form-error">{error}</p>}
 
+          {/* --- Кнопка підтвердження --- */}
           <button type="submit" className="submit-btn">
             {mode === "login" ? "Увійти" : "Зареєструватися"}
           </button>

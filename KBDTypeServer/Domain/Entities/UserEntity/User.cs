@@ -5,8 +5,9 @@ using Microsoft.AspNetCore.Identity;
 
 namespace KBDTypeServer.Domain.Entities.UserEntity
 {
-    public class User : IdentityUser
+    public class User : IdentityUser<int>
     {
+        
         [Required]
         public string FirstName { get; set; } // Default to empty string to avoid null reference issues
 
@@ -14,8 +15,9 @@ namespace KBDTypeServer.Domain.Entities.UserEntity
         public string LastName { get; set; } // Default to empty string to avoid null reference issues
 
         [Required]
+        [Phone]
         [MaxLength(13)]
-        [RegularExpression(@"^(\+380|380)\d{9}$", ErrorMessage = "Phone number must start with +380 or 380 and contain 9 digits after.")]
+        [RegularExpression(@"^380\d{9}$", ErrorMessage = "Phone number must start with 380 and contain 9 digits after.")]
         public string PhoneNumber { get; set; }
 
         [EmailAddress]

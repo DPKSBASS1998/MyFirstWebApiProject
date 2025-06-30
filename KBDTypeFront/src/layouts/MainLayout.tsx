@@ -1,15 +1,15 @@
 // src/layouts/MainLayout.tsx
 import React, { useState, useEffect } from "react";
-import { Link, Outlet, useNavigate} from "react-router-dom";
+import { Link, Outlet, useNavigate } from "react-router-dom";
 import "../styles/Layout.css";
 
 import CartModal from "../components/CartModal";
 import AuthModal from "../components/AuthModal";
 import WishlistModal from "../components/WishlistModal";
 
-import { useIsAuthenticated, useUser } from "../hooks/useAuth"; // Додаємо імпорт
-import { useCart } from "../hooks/useCart"; // <-- правильний шлях до твого кастомного хука
-import { useWishlist } from "../hooks/useWishlist"; // якщо потрібно
+import { useIsAuthenticated, useUser, useLogout } from "../hooks/useAuth";
+import { useCart } from "../hooks/useCart";
+import { useWishlist } from "../hooks/useWishlist";
 
 // Імпорт логотипу через модуль Vite (налаштуй vite-env.d.ts для .png)
 import logo from "../assets/logo.png";
@@ -23,19 +23,20 @@ interface MainLayoutProps {
 const MainLayout: React.FC<MainLayoutProps> = ({ onOpenCart, onOpenAuth }) => {
   const [cartOpen, setCartOpen] = useState<boolean>(false);
   const [authOpen, setAuthOpen] = useState<boolean>(false);
-  const [wishlistOpen, setWishlistOpen] = useState(false); // Додаємо стан
+  const [wishlistOpen, setWishlistOpen] = useState(false);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
 
   const isAuthenticated = useIsAuthenticated();
   const user = useUser();
+  const logout = useLogout();
   const { items: cartItems } = useCart();
-  const { items: wishlistItems } = useWishlist(); // Якщо потрібно використовувати wishlist
-
+  const { items: wishlistItems } = useWishlist();
   const navigate = useNavigate();
 
   // Обробник для кнопки «Профіль»
   const handleProfileClick = () => {
     if (isAuthenticated) {
-      navigate("/my-account");
+      setProfileMenuOpen((v) => !v);
     } else {
       // Якщо передали ззовні проп onOpenAuth, викликаємо його,
       // інакше — відкриваємо внутрішню модалку
@@ -47,18 +48,25 @@ const MainLayout: React.FC<MainLayoutProps> = ({ onOpenCart, onOpenAuth }) => {
     }
   };
 
-  // Обробник для кнопки «Кошик»
-  const handleCartClick = () => {
-    if (onOpenCart) {
-      onOpenCart();
-    } else {
-      setCartOpen(true);
-    }
+  // Обробник виходу
+  const handleLogout = async () => {
+    await logout();
+    setProfileMenuOpen(false);
+    navigate("/", { replace: true });
   };
 
-  const handleWishlistClick = () => {
-    setWishlistOpen(true);
-  };
+  // Закриття меню при кліку поза ним
+  useEffect(() => {
+    if (!profileMenuOpen) return;
+    const handleClick = (e: MouseEvent) => {
+      const menu = document.getElementById("profile-menu-popover");
+      if (menu && !menu.contains(e.target as Node)) {
+        setProfileMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [profileMenuOpen]);
 
   // Додаємо useEffect для реакції на зміну isAuthenticated
   useEffect(() => {
@@ -100,7 +108,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ onOpenCart, onOpenAuth }) => {
             <button
               className="icon-button"
               aria-label="Список бажаного"
-              onClick={handleWishlistClick}
+              onClick={() => setWishlistOpen(true)}
             >
               <i 
                 className={
@@ -111,7 +119,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ onOpenCart, onOpenAuth }) => {
             <button
               className="icon-button"
               aria-label="Кошик"
-              onClick={handleCartClick}
+              onClick={onOpenCart ? onOpenCart : () => setCartOpen(true)}
             >
               <i
                 className={
@@ -121,17 +129,38 @@ const MainLayout: React.FC<MainLayoutProps> = ({ onOpenCart, onOpenAuth }) => {
                 }
               ></i>
             </button>
-            <button
-              className="icon-button"
-              aria-label="Профіль"
-              onClick={handleProfileClick}
-            >
-              {isAuthenticated ? (
-                <i className="bi bi-person-check"></i>
-              ) : (
-                <i className="bi bi-person"></i>
+            <div className="profile-menu-wrapper">
+              <button
+                className="icon-button"
+                aria-label="Профіль"
+                onClick={handleProfileClick}
+              >
+                {isAuthenticated ? (
+                  <i className="bi bi-person-check"></i>
+                ) : (
+                  <i className="bi bi-person"></i>
+                )}
+              </button>
+              {isAuthenticated && profileMenuOpen && (
+                <div id="profile-menu-popover" className="profile-menu-popover">
+                  <button
+                    className="profile-menu-item"
+                    onClick={() => {
+                      setProfileMenuOpen(false);
+                      navigate("/my-account");
+                    }}
+                  >
+                    Мій профіль
+                  </button>
+                  <button
+                    className="profile-menu-item logout"
+                    onClick={handleLogout}
+                  >
+                    Вийти
+                  </button>
+                </div>
               )}
-            </button>
+            </div>
           </div>
         </div>
       </header>

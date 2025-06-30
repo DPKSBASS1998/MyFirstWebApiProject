@@ -19,7 +19,6 @@ export function useFetchAddresses() {
   return () => dispatch(fetchAddresses());
 }
 
-
 // Хук для додавання адреси
 export function useAddAddress() {
   const dispatch = useDispatch<AppDispatch>();

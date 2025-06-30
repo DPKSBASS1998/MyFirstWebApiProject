@@ -1,11 +1,17 @@
 // src/components/AddressSection.jsx
 import React, { useState, useEffect } from "react";
-import type { Address } from "../models/Address";
+import type { AddressDto } from "../dto/address/AddressDto";
+import {
+  getAddresses,
+  addAddress as apiAddAddress,
+  updateAddress as apiUpdateAddress,
+  removeAddress as apiRemoveAddress,
+} from "../api/Address";
 import "../styles/AddressSection.css";
 
 // AddressCard — картка адреси
 type AddressCardProps = {
-  addr: Address;
+  addr: AddressDto;
   onEdit: (id: number) => void;
   onDelete: (id: number) => void;
   isSelected: boolean;
@@ -20,7 +26,7 @@ function AddressCard({ addr, onEdit, onDelete, isSelected, onSelect }: AddressCa
       <div className="address-info">
         <p>{`${addr.region}, ${addr.city}`}</p>
         <p>
-          {`${addr.street}${addr.apartment ? `, кв. ${addr.apartment}` : ""}`}
+          {`${addr.street}, буд. ${addr.building}${addr.apartment ? `, кв. ${addr.apartment}` : ""}`}
         </p>
         <p>{addr.postalCode}</p>
       </div>
@@ -54,12 +60,12 @@ function AddressCard({ addr, onEdit, onDelete, isSelected, onSelect }: AddressCa
 
 // AddressEditor — редактор адреси (модалка)
 type AddressEditorProps = {
-  address: Partial<Address>;
-  onSave: (address: Partial<Address>) => void;
+  address: Partial<AddressDto>;
+  onSave: (address: Partial<AddressDto>) => void;
   onCancel: () => void;
 };
 function AddressEditor({ address, onSave, onCancel }: AddressEditorProps) {
-  const [form, setForm] = useState<Partial<Address>>(address || {});
+  const [form, setForm] = useState<Partial<AddressDto>>(address || {});
 
   useEffect(() => {
     setForm(address || {});
@@ -109,6 +115,15 @@ function AddressEditor({ address, onSave, onCancel }: AddressEditorProps) {
               />
             </label>
             <label>
+              Будинок
+              <input
+                name="building"
+                value={form.building || ""}
+                onChange={handleChange}
+                placeholder="Будинок"
+              />
+            </label>
+            <label>
               Квартира
               <input
                 name="apartment"
@@ -145,26 +160,30 @@ function AddressEditor({ address, onSave, onCancel }: AddressEditorProps) {
   );
 }
 
-// AddressSection — головний компонент
-type AddressSectionProps = {
-  addresses: Address[];
-  addAddress: (a: Address) => Promise<any>;
-  updateAddress: (a: Address) => Promise<any>;
-  removeAddress: (id: number) => Promise<any>;
-  selectAddress: (id: number) => void;
-  selectedAddressId: number | null;
-};
-
-export default function AddressSection({
-  addresses,
-  addAddress,
-  updateAddress,
-  removeAddress,
-  selectAddress,
-  selectedAddressId,
-}: AddressSectionProps) {
+// ======= АВТОНОМНИЙ AddressSection =======
+export default function AddressSection() {
+  const [addresses, setAddresses] = useState<AddressDto[]>([]);
+  const [selectedAddressId, setSelectedAddressId] = useState<number | null>(null);
   const [showAddresses, setShowAddresses] = useState(true);
-  const [editingAddress, setEditingAddress] = useState<Partial<Address> | null>(null);
+  const [editingAddress, setEditingAddress] = useState<Partial<AddressDto> | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  // Завантажити адреси при монтуванні
+  useEffect(() => {
+    loadAddresses();
+    // eslint-disable-next-line
+  }, []);
+
+  const loadAddresses = async () => {
+    setLoading(true);
+    try {
+      const data = await getAddresses();
+      setAddresses(data);
+      if (data.length > 0) setSelectedAddressId(data[0].id);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleAddAddress = () => {
     setEditingAddress({
@@ -173,7 +192,7 @@ export default function AddressSection({
       street: "",
       apartment: "",
       postalCode: "",
-      userId: "",
+      userId: 0,
     });
   };
 
@@ -183,16 +202,26 @@ export default function AddressSection({
   };
 
   const handleDeleteAddress = async (id: number) => {
-    await removeAddress(id);
+    setLoading(true);
+    await apiRemoveAddress(id);
+    await loadAddresses();
+    setLoading(false);
   };
 
-  const handleSave = async (address: Partial<Address>) => {
+  const handleSave = async (address: Partial<AddressDto>) => {
+    setLoading(true);
     if (address.id) {
-      await updateAddress(address as Address);
+      await apiUpdateAddress(address as AddressDto);
     } else {
-      await addAddress(address as Address);
+      await apiAddAddress(address as AddressDto);
     }
     setEditingAddress(null);
+    await loadAddresses();
+    setLoading(false);
+  };
+
+  const handleSelect = (id: number) => {
+    setSelectedAddressId(id);
   };
 
   return (
@@ -241,13 +270,12 @@ export default function AddressSection({
                 onEdit={handleEditAddress}
                 onDelete={handleDeleteAddress}
                 isSelected={addr.id === selectedAddressId}
-                onSelect={() => selectAddress(addr.id)}
+                onSelect={() => handleSelect(addr.id)}
               />
             ))
           )}
         </div>
       ) : (
-        // Якщо список закритий, але є обрана адреса — показати тільки її
         selectedAddressId && addresses.length > 0 ? (
           <div className="addresses-dropdown">
             <AddressCard
@@ -256,13 +284,12 @@ export default function AddressSection({
               onEdit={handleEditAddress}
               onDelete={handleDeleteAddress}
               isSelected={true}
-              onSelect={() => selectAddress(selectedAddressId)}
+              onSelect={() => handleSelect(selectedAddressId)}
             />
           </div>
         ) : null
       )}
-      {/* Якщо loading потрібен — додай loading з useAddresses */}
-      {/* {loading && <div className="loading-overlay">Завантаження...</div>} */}
+      {loading && <div className="loading-overlay">Завантаження...</div>}
     </div>
   );
 }

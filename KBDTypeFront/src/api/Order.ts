@@ -1,24 +1,14 @@
 import axios from "axios";
-import type { CreateOrderDto } from "../dto/order/OrderCreateDto";
+import { OrderCreateDto } from "../dto/order/OrderCreateDto";
 
-const API_URL = "/api/order";
+const API_URL = "/api/orders";
 
-export async function createOrder(orderData: CreateOrderDto) {
-  const response = await axios.post(`${API_URL}/create`, orderData);
+export async function createOrder(orderData: OrderCreateDto) {
+  const response = await axios.post(`${API_URL}`, orderData);
   return response.data;
 }
 
-export async function getOrder(orderId: number) {
-  const response = await axios.get(`${API_URL}/${orderId}`);
-  return response.data;
-}
-
-export async function updateOrder(orderId: number, orderData: any) {
-  const response = await axios.put(`${API_URL}/update/${orderId}`, orderData);
-  return response.data;
-}
-
-export async function deleteOrder(orderId: number) {
-  const response = await axios.delete(`${API_URL}/delete/${orderId}`);
+export async function getOrder() {
+  const response = await axios.get(`${API_URL}`);
   return response.data;
 }

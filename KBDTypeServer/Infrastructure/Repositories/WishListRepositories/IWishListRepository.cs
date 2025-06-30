@@ -43,6 +43,6 @@ namespace KBDTypeServer.Infrastructure.Repositories.WishListRepositories
         /// </summary>
         /// <param name="userId">The ID of the user.</param>"
         /// <returns> List of items for userID.</returns>
-        Task<List<WishListItem>> GetWishListItemsByUserIdAsync(string userId);
+        Task<List<WishListItem>> GetWishListItemsByUserIdAsync(int userId);
     }
 }

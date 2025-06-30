@@ -3,10 +3,18 @@ using KBDTypeServer.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
-using KBDTypeServer.WebApi.Mapping;
 using System.Text.Json;
 using KBDTypeServer.Infrastructure.Repositories.OrderRepositories;
+using KBDTypeServer.Infrastructure.Repositories.ProductRepositories;
+using KBDTypeServer.Infrastructure.Repositories.UserRepositories;
+using KBDTypeServer.Infrastructure.Repositories.AddressesRepositories;
+using KBDTypeServer.Infrastructure.Repositories.CartItemRepositories;
+using KBDTypeServer.Infrastructure.Repositories.WishListRepositories;
+using KBDTypeServer.Application.Services.AuthServices;
+using KBDTypeServer.Application.Services.UserServices;
+using KBDTypeServer.Application.Services.AddressService;
 using KBDTypeServer.Domain.Entities.UserEntity;
+using KBDTypeServer.Application.Mapping;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,21 +34,30 @@ builder.Services.AddSwaggerGen();
 /// <summary>
 /// <!-- Додавання сервісів -->-->
 /// </summary>
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserProfileService, UserProfileService>();
+builder.Services.AddScoped<IAddressService, AddressService>();
 
 /// <summary>
 /// <!-- Додавання репозиторіїв -->-->
 /// </summary>
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
+builder.Services.AddScoped<IAddressRepository, AddressRepository>();
+builder.Services.AddScoped<ICartItemRepository, CartItemRepository>();
+builder.Services.AddScoped<IWishListRepository, WishListRepository>();
 
 /// <summary>
 /// <!-- Додавання AutoMapper -->-->
 /// </summary>
-builder.Services.AddAutoMapper(typeof(MappingProfile)); // якщо файл в WebApi
+builder.Services.AddAutoMapper(typeof(KBDTypeServer.Application.Mapping.MappingProfile));
+
 
 /// <summary>
 /// Налаштування Identity
 /// </summary>
-builder.Services.AddIdentity<User, IdentityRole>(options =>
+builder.Services.AddIdentity<User, IdentityRole<int>>(options =>
 {
     options.Password.RequireDigit = false;
     options.Password.RequiredLength = 1;

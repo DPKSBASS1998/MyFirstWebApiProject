@@ -14,7 +14,7 @@ namespace KBDTypeServer.Domain.Entities.OrderEntity
         /// <summary>
         /// Unique identifier for the user who placed the order.
         /// </summary>
-        public string? UserId { get; set; }
+        public int? UserId { get; set; }
         public User? User { get; set; }
 
         /// <summary>

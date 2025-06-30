@@ -1,15 +1,16 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using KBDTypeServer.Domain.Enums;
 using KBDTypeServer.Domain.Entities;
+using KBDTypeServer.Domain.Entities.AddressEnity;
 using KBDTypeServer.Domain.Entities.OrderEntity;
 using KBDTypeServer.Domain.Entities.ProductEntity;
-using KBDTypeServer.Domain.Enums;
-using KBDTypeServer.Domain.Entities.AddressEnity;
 using KBDTypeServer.Domain.Entities.UserEntity;
+using Microsoft.AspNetCore.Identity;
 
 namespace KBDTypeServer.Infrastructure.Data
 {
-    public class ApplicationDbContext : IdentityDbContext<User>
+    public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<int>, int>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)

@@ -15,6 +15,7 @@ export const store = configureStore({
     addresses: addressesReducer,
     cart: cartReducer, // додай цей рядок
     wishlist: wishlistReducer,
+    // order: orderReducer // тут можна додати редюсер для замовлень, якщо він буде
   },
 });
 

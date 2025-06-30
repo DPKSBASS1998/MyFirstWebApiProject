@@ -14,12 +14,12 @@ const initialState: AddressesState = {
   selectedId: null,
 };
 
-export const fetchAddresses = createAsyncThunk("addresses/fetch", async () => {
+export const fetchAddresses = createAsyncThunk<AddressDto[]>("addresses/fetch", async () => {
   return await getAddresses();
 });
 
 export const addAddressThunk = createAsyncThunk(
-  "addresses/add",
+  "addresses/add", // name the thunk for clarity
   async (address: AddressDto, { dispatch }) => {
     await addAddress(address);
     return await dispatch(fetchAddresses()).unwrap();

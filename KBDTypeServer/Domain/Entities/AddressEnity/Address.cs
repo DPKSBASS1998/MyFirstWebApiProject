@@ -14,7 +14,7 @@ namespace KBDTypeServer.Domain.Entities.AddressEnity
         /// </summary>
 
         [Required]
-        public string UserId { get; set; }
+        public int UserId { get; set; }
         public User User { get; set; }
 
         [Required, MaxLength(100)]

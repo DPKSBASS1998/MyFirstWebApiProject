@@ -1,6 +1,10 @@
 // dto/LoginDto.ts
-export interface LoginDto {
-  email: string;
-  password: string;
-  rememberMe: boolean;
+export class LoginDto {
+  identifier: string = "";
+  password: string = "";
+  rememberMe?: boolean = false;
+
+  constructor(init?: Partial<LoginDto>) {
+    Object.assign(this, init);
+  }
 }

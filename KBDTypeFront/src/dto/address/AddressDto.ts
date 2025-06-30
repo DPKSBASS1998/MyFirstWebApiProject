@@ -1,10 +1,14 @@
-// dto/AddressDto.ts
-export interface AddressDto {
-  id: number;
-  region: string;
-  city: string;
-  street: string;
-  apartment: string;
-  postalCode: string;
-  userId: string;
+export class AddressDto {
+  id: number = 0;
+  userId: number = 0;
+  region: string = "";
+  city: string = "";
+  street: string = "";
+  building: string = "";
+  apartment?: string | null = null;
+  postalCode: string = "";
+
+  constructor(init?: Partial<AddressDto>) {
+    Object.assign(this, init);
+  }
 }

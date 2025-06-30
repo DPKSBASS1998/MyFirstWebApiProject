@@ -1,9 +1,9 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { getProfile, updateProfile } from "../api/Profile";
-import type { ProfileDto } from "../dto/profile/ProfileDto";
+import type { UserProfileDto } from "../dto/profile/UserProfileDto";
 
 type ProfileState = {
-  data: ProfileDto | null;
+  data: UserProfileDto | null;
   loading: boolean;
 };
 
@@ -12,15 +12,16 @@ const initialState: ProfileState = {
   loading: false,
 };
 
-export const fetchProfile = createAsyncThunk("profile/fetch", async () => {
+export const fetchProfile = createAsyncThunk<UserProfileDto>("profile/fetch", 
+  async () => {
   return await getProfile();
 });
 
 export const updateProfileThunk = createAsyncThunk(
   "profile/update",
-  async (data: Partial<ProfileDto>, { dispatch }) => {
-    await updateProfile(data);
-    return await dispatch(fetchProfile()).unwrap();
+  async (data: Partial<UserProfileDto>) => {
+    // updateProfile повертає оновлений профіль
+    return await updateProfile(data);
   }
 );
 
@@ -45,7 +46,7 @@ const profileSlice = createSlice({
         state.loading = true;
       })
       .addCase(updateProfileThunk.fulfilled, (state, action) => {
-        state.data = action.payload;
+        state.data = action.payload; // тут payload — це вже оновлений профіль
         state.loading = false;
       })
       .addCase(updateProfileThunk.rejected, (state) => {

@@ -1,10 +1,10 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { getMe, loginApi, registerApi, logoutApi } from "../api/Auth";
 import type { LoginDto } from "../dto/auth/LoginDto";
-import type { RegisterDto } from "../dto/auth/RegisterDto";
+import type { RegistrationDto } from "../dto/auth/RegistrationDto";
 
 type AuthState = {
-  user: string | null;
+  user: number | null;
   isAuthenticated: boolean;
   loading: boolean;
 };
@@ -15,7 +15,7 @@ const initialState: AuthState = {
   loading: true,
 };
 
-export const fetchMe = createAsyncThunk("auth/fetchMe", async () => {
+export const fetchMe = createAsyncThunk("auth/me", async () => {
   return await getMe();
 });
 
@@ -24,7 +24,7 @@ export const login = createAsyncThunk("auth/login", async (data: LoginDto) => {
   return await getMe();
 });
 
-export const register = createAsyncThunk("auth/register", async (data: RegisterDto) => {
+export const register = createAsyncThunk("auth/register", async (data: RegistrationDto) => {
   await registerApi(data);
   return await getMe();
 });
@@ -44,7 +44,7 @@ const authSlice = createSlice({
       })
       .addCase(fetchMe.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload.username ?? null;
+        state.user = action.payload.id ?? null;
         state.isAuthenticated = !!action.payload.isAuthenticated;
       })
       .addCase(fetchMe.rejected, (state) => {
@@ -53,11 +53,11 @@ const authSlice = createSlice({
         state.isAuthenticated = false;
       })
       .addCase(login.fulfilled, (state, action) => {
-        state.user = action.payload.username ?? null;
+        state.user = action.payload.id ?? null;
         state.isAuthenticated = !!action.payload.isAuthenticated;
       })
       .addCase(register.fulfilled, (state, action) => {
-        state.user = action.payload.username ?? null;
+        state.user = action.payload.id ?? null;
         state.isAuthenticated = !!action.payload.isAuthenticated;
       })
       .addCase(logout.fulfilled, (state) => {

@@ -3,7 +3,7 @@ using KBDTypeServer.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 namespace KBDTypeServer.Infrastructure.Repositories.WishListRepositories
 {
-    public class WishListRepository
+    public class WishListRepository : IWishListRepository
     {
         private readonly ApplicationDbContext _context;
         public WishListRepository(ApplicationDbContext applicationDbContext)
@@ -45,9 +45,9 @@ namespace KBDTypeServer.Infrastructure.Repositories.WishListRepositories
             if (wishListItemId <= 0) throw new ArgumentOutOfRangeException(nameof(wishListItemId), "Wish List Item ID must be greater than zero.");
             return await _context.Set<WishListItem>().AnyAsync(wli => wli.Id == wishListItemId);
         }
-        public async Task<List<WishListItem>> GetWishListItemsByUserIdAsync(string userId)
+        public async Task<List<WishListItem>> GetWishListItemsByUserIdAsync(int userId)
         {
-            if (string.IsNullOrEmpty(userId)) throw new ArgumentNullException(nameof(userId), "User ID cannot be null or empty.");
+            if (string.IsNullOrEmpty(userId.ToString())) throw new ArgumentNullException(nameof(userId), "User ID cannot be null or empty.");
             return await _context.Set<WishListItem>()
                 .Where(wli => wli.UserId == userId)
                 .ToListAsync();

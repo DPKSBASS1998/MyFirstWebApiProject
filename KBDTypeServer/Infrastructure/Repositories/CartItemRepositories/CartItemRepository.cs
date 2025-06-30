@@ -1,7 +1,7 @@
 ﻿using KBDTypeServer.Domain.Entities;
 using KBDTypeServer.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-namespace KBDTypeServer.Infrastructure.Repositories.CartItemRepository
+namespace KBDTypeServer.Infrastructure.Repositories.CartItemRepositories
 {
     public class CartItemRepository : ICartItemRepository
     {
@@ -46,9 +46,9 @@ namespace KBDTypeServer.Infrastructure.Repositories.CartItemRepository
             return await _context.Set<CartItem>().AnyAsync(ci => ci.Id == cartItemId);
         }
 
-        public async Task<List<CartItem>> GetCartItemsByUserIdAsync(string userId)
+        public async Task<List<CartItem>> GetCartItemsByUserIdAsync(int userId)
         {
-            if (string.IsNullOrEmpty(userId)) throw new ArgumentNullException(nameof(userId), "User ID cannot be null or empty.");
+            if (string.IsNullOrEmpty(userId.ToString())) throw new ArgumentNullException(nameof(userId), "User ID cannot be null or empty.");
             return await _context.Set<CartItem>()
                 .Where(ci => ci.UserId == userId)
                 .ToListAsync();
