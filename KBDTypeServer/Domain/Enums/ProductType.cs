@@ -2,9 +2,9 @@
 {
     public enum ProductType
     {
-        Switch,
-        Keycap,
-        Accessory
+        Switch = 1,
+        Keycap = 2,
+        Accessory = 3
     }
 
 }

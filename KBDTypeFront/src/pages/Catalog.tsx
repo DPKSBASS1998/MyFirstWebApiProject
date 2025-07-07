@@ -10,51 +10,32 @@ export default function Catalog() {
   const [pendingFilter, setPendingFilter] = useState<SwitchFilterDto>({});
   const { products, loading } = useProducts(filter);
 
-  // Розрахунок min/max значень для фільтрів
+  const getNumericFields = (products: any[]) => {
+    if (!products.length) return [];
+    return Object.keys(products[0]).filter(
+      (key) => typeof products[0][key] === "number"
+    );
+  };
+
+  // Розрахунок min/max значень для фільтрів  
   const minValues = useMemo(() => {
-    if (!products.length) {
-      return {
-        operatingForce: 0,
-        totalTravel: 0,
-        preTravel: 0,
-        tactilePos: 0,
-        tactileForce: 0,
-        pinCount: 0,
-        price: 0,
-      };
+    if (!products.length) return {};
+    const fields = getNumericFields(products);
+    const result: Record<string, number> = {};
+    for (const key of fields) {
+      result[key] = Math.min(...products.map((p) => p[key]));
     }
-    return {
-      operatingForce: Math.min(...products.map((p) => p.operatingForce)),
-      totalTravel: Math.min(...products.map((p) => p.totalTravel)),
-      preTravel: Math.min(...products.map((p) => p.preTravel)),
-      tactilePos: Math.min(...products.map((p) => p.tactilePosition)),
-      tactileForce: Math.min(...products.map((p) => p.tactileForce)),
-      pinCount: Math.min(...products.map((p) => p.pinCount)),
-      price: Math.min(...products.map((p) => p.price)),
-    };
+    return result;
   }, [products]);
 
   const maxValues = useMemo(() => {
-    if (!products.length) {
-      return {
-        operatingForce: 0,
-        totalTravel: 0,
-        preTravel: 0,
-        tactilePos: 0,
-        tactileForce: 0,
-        pinCount: 0,
-        price: 0,
-      };
+    if (!products.length) return {};
+    const fields = getNumericFields(products);
+    const result: Record<string, number> = {};
+    for (const key of fields) {
+      result[key] = Math.max(...products.map((p) => p[key]));
     }
-    return {
-      operatingForce: Math.max(...products.map((p) => p.operatingForce)),
-      totalTravel: Math.max(...products.map((p) => p.totalTravel)),
-      preTravel: Math.max(...products.map((p) => p.preTravel)),
-      tactilePos: Math.max(...products.map((p) => p.tactilePosition)),
-      tactileForce: Math.max(...products.map((p) => p.tactileForce)),
-      pinCount: Math.max(...products.map((p) => p.pinCount)),
-      price: Math.max(...products.map((p) => p.price)),
-    };
+    return result;
   }, [products]);
 
   const handleFilterChange = (
@@ -80,16 +61,24 @@ export default function Catalog() {
     setPendingFilter(filter);
   }, [filter]);
 
+  const numericFields = React.useMemo(() => {
+    if (!products.length) return [];
+    return Object.keys(products[0]).filter(
+      (key) => typeof products[0][key] === "number"
+    );
+  }, [products]);
+
   return (
     <div className="catalog-page">
       <aside className="catalog-sidebar">
         <h3>Фільтри</h3>
         <ProductFilter
-          filter={pendingFilter}
+          filter={filter}
           onChange={handleFilterChange}
           onSubmit={handleFilterSubmit}
           minValues={minValues}
           maxValues={maxValues}
+          numericFields={numericFields}
         />
       </aside>
 

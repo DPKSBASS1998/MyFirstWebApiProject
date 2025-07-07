@@ -10,20 +10,25 @@ using KBDTypeServer.Infrastructure.Repositories.UserRepositories;
 using KBDTypeServer.Infrastructure.Repositories.AddressesRepositories;
 using KBDTypeServer.Infrastructure.Repositories.CartItemRepositories;
 using KBDTypeServer.Infrastructure.Repositories.WishListRepositories;
+
 using KBDTypeServer.Application.Services.AuthServices;
 using KBDTypeServer.Application.Services.UserServices;
 using KBDTypeServer.Application.Services.AddressService;
+using KBDTypeServer.Application.Services.OrderServices;
+using KBDTypeServer.Application.Services.PaymentService;
+using KBDTypeServer.Application.Services.ProductServices;
 using KBDTypeServer.Domain.Entities.UserEntity;
 using KBDTypeServer.Application.Mapping;
+using KBDTypeServer.Application.Services.ElitApiServices;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Додавання контексту бази даних
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Інші сервіси
+// пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -32,14 +37,19 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 /// <summary>
-/// <!-- Додавання сервісів -->-->
+/// <!-- пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ -->-->
 /// </summary>
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserProfileService, UserProfileService>();
 builder.Services.AddScoped<IAddressService, AddressService>();
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<IElitApiService, ElitApiService>();
+
 
 /// <summary>
-/// <!-- Додавання репозиторіїв -->-->
+/// <!-- пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ -->-->
 /// </summary>
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
@@ -49,13 +59,13 @@ builder.Services.AddScoped<ICartItemRepository, CartItemRepository>();
 builder.Services.AddScoped<IWishListRepository, WishListRepository>();
 
 /// <summary>
-/// <!-- Додавання AutoMapper -->-->
+/// <!-- пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ AutoMapper -->-->
 /// </summary>
 builder.Services.AddAutoMapper(typeof(KBDTypeServer.Application.Mapping.MappingProfile));
 
 
 /// <summary>
-/// Налаштування Identity
+/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ Identity
 /// </summary>
 builder.Services.AddIdentity<User, IdentityRole<int>>(options =>
 {
@@ -70,7 +80,7 @@ builder.Services.AddIdentity<User, IdentityRole<int>>(options =>
 .AddDefaultTokenProviders();
 
 /// <summary>
-/// Налаштування CORS
+/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ CORS
 /// </summary>
 builder.Services.AddCors(options =>
 {
@@ -83,7 +93,7 @@ builder.Services.AddCors(options =>
 });
 
 /// <summary>
-/// Налаштування кукі для автентифікації
+/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 /// </summary>
 builder.Services.ConfigureApplicationCookie(options =>
 {

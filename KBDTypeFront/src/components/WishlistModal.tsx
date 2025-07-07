@@ -4,18 +4,18 @@ import { useNavigate } from "react-router-dom";
 import "../styles/WishlistModal.css";
 
 export default function WishlistModal({ onClose }: { onClose: () => void }) {
-  const navigate = useNavigate();
   const { items, removeFromWishlist } = useWishlist();
   const { addToCart, removeFromCart, isInCart } = useCart();
 
   return (
+    console.log("Wishlist items:", items), // For debugging
+
     <div className="modal-overlay" onClick={onClose}>
       <div className="wishlist-modal" onClick={e => e.stopPropagation()}>
         <button className="close-btn" onClick={onClose}>
           <i className="bi bi-x-lg"></i>
         </button>
         <h2>Список бажаного</h2>
-
         {items.length === 0 ? (
           <p className="empty-cart">Список бажаного порожній</p>
         ) : (
@@ -23,7 +23,7 @@ export default function WishlistModal({ onClose }: { onClose: () => void }) {
             <div className="wishlist-items">
               {items.map(item => (
                 <div className="wishlist-item" key={item.productId}>
-                  <img src={item.imagePath} alt={item.name} />
+                  <img src={item.imagePath} />
                   <div className="item-info">
                     <h4>{item.name}</h4>
                     <p>{item.price.toFixed(2)} ₴</p>
@@ -34,7 +34,10 @@ export default function WishlistModal({ onClose }: { onClose: () => void }) {
                       onClick={() =>
                         isInCart(item.productId)
                           ? removeFromCart(item.productId)
-                          : addToCart({ ...item, quantity: 1 })
+                          : addToCart({
+                            ...item, quantity: 1,
+                            imageUrl: ""
+                          })
                       }
                       aria-label={
                         isInCart(item.productId)

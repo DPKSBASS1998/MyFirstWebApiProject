@@ -6,10 +6,9 @@ import { store } from "./store/store";
 import './styles/style.css'
 import "bootstrap-icons/font/bootstrap-icons.css";
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
-  
-    <Provider store={store}>
-      <App />
-    </Provider>
-  
+const root = ReactDOM.createRoot(document.getElementById("root")!);
+root.render(
+  <Provider store={store}>
+    <App />
+  </Provider>
 );

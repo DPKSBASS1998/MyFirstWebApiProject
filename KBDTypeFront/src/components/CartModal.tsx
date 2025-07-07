@@ -22,7 +22,7 @@ export default function CartModal({ onClose }: { onClose: () => void }) {
             <div className="cart-items">
               {items.map((item) => (
                 <div className="cart-item" key={item.productId}>
-                  <img src={item.imagePath} alt={item.name} />
+                  <img src={item.imageUrl} />
                   <div className="item-info">
                     <h4>{item.name}</h4>
                     <p>{item.price.toFixed(2)} ₴</p>

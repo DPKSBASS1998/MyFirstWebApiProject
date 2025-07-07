@@ -14,15 +14,15 @@ namespace KBDTypeServer.Infrastructure.Repositories.ProductRepositories
 
         public async Task<Product?> AddProductAsync(Product product, CancellationToken cancellationToken)
         {
-            if (product == null) throw new ArgumentNullException(nameof(product));
+            ArgumentNullException.ThrowIfNull(product);
             _context.Set<Product>().Add(product);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
             return product;
         }
-        public async Task<Product?> GetProductByIdAsync(int productId, CancellationToken cancellation)
+        public async Task<Product?> GetProductByIdAsync(int productId, CancellationToken cancellationToken)
         {
             if (productId <= 0) throw new ArgumentOutOfRangeException(nameof(productId), "Product ID must be greater than zero.");
-            return await _context.Set<Product>().FindAsync(productId);
+            return await _context.Set<Product>().FindAsync(productId, cancellationToken);
         }
         public async Task<List<Product?>> GetAllProductsAsync(CancellationToken cancellationToken)
         {
@@ -37,7 +37,7 @@ namespace KBDTypeServer.Infrastructure.Repositories.ProductRepositories
         {
             if (product == null) throw new ArgumentNullException(nameof(product));
             var updatedProduct = _context.Set<Product>().Update(product);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
             return updatedProduct.Entity;
         }
         public async Task<bool> DeleteProductAsync(int productId, CancellationToken cancellationToken)
@@ -46,13 +46,13 @@ namespace KBDTypeServer.Infrastructure.Repositories.ProductRepositories
             var product = await GetProductByIdAsync(productId, cancellationToken);
             if (product == null) throw new KeyNotFoundException($"Product with ID {productId} not found.");
             _context.Set<Product>().Remove(product);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
             return true;
         }
         public async Task<bool> ProductExistsAsync(int productId, CancellationToken cancellationToken)
         {
             if (productId <= 0) throw new ArgumentOutOfRangeException(nameof(productId), "Product ID must be greater than zero.");
-            return await _context.Set<Product>().AnyAsync(p => p.Id == productId);
+            return await _context.Set<Product>().AnyAsync(p => p.Id == productId, cancellationToken);
         }
         
     }

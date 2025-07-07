@@ -6,7 +6,7 @@ export class OrderCreateDto {
     region: string = '';
     city: string = '';
     street: string = '';
-    house: string = '';
+    building: string = '';
     apartment?: string;
     postalCode: string = '';
     comment?: string;

@@ -6,35 +6,19 @@ namespace KBDTypeServer.Domain.Entities.OrderEntity
 {
     public class Order
     {
-        /// <summary>
-        /// Unique identifier for the order.
-        /// </summary>
         [Key]
         public int Id { get; set; }
-        /// <summary>
-        /// Unique identifier for the user who placed the order.
-        /// </summary>
         public int? UserId { get; set; }
         public User? User { get; set; }
-
-        /// <summary>
-        /// Data about user who placed the order.
-        /// </summary>
         [Required]
         public string FirstName { get; set; }
         [Required]
         public string LastName { get; set; }
-
         [EmailAddress]
         public string? Email { get; set; }
-
         [Phone]
         [Required]
         public string PhoneNumber { get; set; }
-
-        /// <summary>
-        /// Adress details for the order.
-        /// </summary>
         [Required]
         public string Region { get; set; }
         [Required]
@@ -46,42 +30,24 @@ namespace KBDTypeServer.Domain.Entities.OrderEntity
         public string? Apartment { get; set; }
         [Required]
         public string PostalCode { get; set; }
-
-        /// <summary>
-        /// List of items in the order, each represented by an OrderItem entity.
-        /// </summary>
         public List<OrderItem> Items { get; set; } = new();
-
-        /// <summary>
-        /// Optional comment or note about the order.
-        /// </summary>
         public string? Comment { get; set; }
-        public string? PaymentId { get; set; }
 
-        /// <summary>
-        /// Freight Tracking Link (TrackingNumber) for the order, if applicable.
-        /// </summary>
+        // --- Поля для інтеграції зі Stripe (обидва обов'язкові для зберігання) ---
+        public string? PaymentId { get; set; }
+        
+        // --------------------------------------------------------------------
+
         public string? TrackingNumber { get; set; }
         public OrderStatus Status { get; set; }
-        /// <summary>
-        /// Price before any discounts or shipping costs.
-        /// </summary>
         public decimal Subtotal { get; set; }
-        // Якщо в майбутньому буде логіка для shippingPrice і discount, то можна додати їх як властивості
-        //public decimal ShippingPrice { get; set; }
-        //public decimal Discount { get; set; }
-
-        /// <summary>
-        /// Total price of the order, including all items, discounts, and shipping costs.
-        /// </summary>
         public decimal TotalPrice { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? PaidAt { get; set; }
         public DateTime? ShippedAt { get; set; }
         public DateTime? DeliveredAt { get; set; }
         public DateTime? CancelledAt { get; set; }
-
-        public DateTime? RefundedAt { get; set; } // Додано для відстеження часу повернення
+        public DateTime? RefundedAt { get; set; }
 
         private static readonly Dictionary<OrderStatus, List<OrderStatus>> AllowedTransitions = new()
         {
@@ -90,10 +56,10 @@ namespace KBDTypeServer.Domain.Entities.OrderEntity
             [OrderStatus.Paid] = new() { OrderStatus.Shipped, OrderStatus.Cancelled },
             [OrderStatus.WhatingForShipping] = new() { OrderStatus.Shipped, OrderStatus.Cancelled },
             [OrderStatus.Shipped] = new() { OrderStatus.Delivered },
-            [OrderStatus.Delivered] = new() {OrderStatus.WaitingForRefund, OrderStatus.Success},// // Додано можливість повернення після доставки
-            [OrderStatus.WaitingForRefund] = new() { OrderStatus.Refunded}, // Додано можливість повернення
-            [OrderStatus.Cancelled] = new() { OrderStatus.WaitingForRefund }, // Не можна змінити статус після скасування
-            [OrderStatus.Refunded] = new() { OrderStatus.Failed } // Повернення завершено
+            [OrderStatus.Delivered] = new() {OrderStatus.WaitingForRefund, OrderStatus.Success},
+            [OrderStatus.WaitingForRefund] = new() { OrderStatus.Refunded},
+            [OrderStatus.Cancelled] = new() { OrderStatus.WaitingForRefund },
+            [OrderStatus.Refunded] = new() { OrderStatus.Failed }
         };
 
         public void SetStatus(OrderStatus newStatus, bool force = false)
@@ -109,15 +75,10 @@ namespace KBDTypeServer.Domain.Entities.OrderEntity
 
             switch (newStatus)
             {
-                case OrderStatus.WaitingForPayment:
-                    // WaitingForPayment does not have a specific timestamp, but can be used for logging
-                    break;
                 case OrderStatus.Paid:
                     PaidAt = now;
-                    extra = $"PaymentId: {PaymentId}";
-                    break;
-                case OrderStatus.WhatingForShipping:
-                    // WhatingForShipping does not have a specific timestamp, but can be used for logging
+                    // ВИПРАВЛЕНО: Використовуємо PaymentIntentId для логування
+                    extra = $"PaymentIntentId: {PaymentId}";
                     break;
                 case OrderStatus.Shipped:
                     ShippedAt = now;
@@ -125,88 +86,50 @@ namespace KBDTypeServer.Domain.Entities.OrderEntity
                     break;
                 case OrderStatus.Delivered:
                     DeliveredAt = now;
-                    extra = $"Your package is waiting for you)";
+                    extra = "Your package is waiting for you)";
                     break;
                 case OrderStatus.Cancelled:
                     CancelledAt = now;
                     break;
-                case OrderStatus.WaitingForRefund:
-                    // WaitingForRefund does not have a specific timestamp, but can be used for logging
-                    break;
                 case OrderStatus.Refunded:
                     RefundedAt = now;
-                    extra = $"Refunded sucsesfull: {now}";
+                    extra = $"Refunded successfully: {now}";
                     break;
+                // Інші статуси не потребують додаткової інформації
+                case OrderStatus.WaitingForPayment:
+                case OrderStatus.WhatingForShipping:
+                case OrderStatus.WaitingForRefund:
                 case OrderStatus.Success:
-                    // Success does not have a specific timestamp, but can be used for logging
-                    break;
                 case OrderStatus.Failed:
-                    // Failed does not have a specific timestamp, but can be used for logging
                     break;
-
             }
 
             OnStatusChanged?.Invoke(this, newStatus, extra);
         }
 
-
-        /// <summary>
-        /// При зміні статусу замовлення викликається подія.
-        /// </summary>
         public event Action<Order, OrderStatus, string?>? OnStatusChanged;
 
-        public void WaitForPayment()
-        {
-            SetStatus(OrderStatus.WaitingForPayment);
-        }
+        public void WaitForPayment() => SetStatus(OrderStatus.WaitingForPayment);
 
         public void Pay()
         {
+            // ВИДАЛЕНО: Логіка з PaymentId тут не потрібна.
+            // Статус Paid встановлюється через вебхук, який викликає SetStatus.
+            // Цей метод може бути застарілим або використовуватися для ручного підтвердження.
             SetStatus(OrderStatus.Paid);
-            // PaymentId can be generated or assigned here if needed
-            PaymentId ??= Guid.NewGuid().ToString();
         }
 
-        public void WaitForShipping()
-        {
-            SetStatus(OrderStatus.WhatingForShipping);
-        }
-
+        public void WaitForShipping() => SetStatus(OrderStatus.WhatingForShipping);
         public void Ship()
         {
             SetStatus(OrderStatus.Shipped);
-            // FTL can be generated or assigned here if needed
-            TrackingNumber ??= Guid.NewGuid().ToString(); // Example of generating a tracking link
+            TrackingNumber ??= Guid.NewGuid().ToString();
         }
-
-        public void Deliver()
-        {
-            SetStatus(OrderStatus.Delivered);
-        }
-
-        public void WaitForRefund()
-        {
-            SetStatus(OrderStatus.WaitingForRefund);
-        }
-
-        public void Refund()
-        {
-            SetStatus(OrderStatus.Refunded);
-        }
-
-        public void MarkAsSuccess()
-        {
-            SetStatus(OrderStatus.Success);
-        }
-        public void MarkAsFailed()
-        {
-            SetStatus(OrderStatus.Failed);
-        }
-
-        public void Cancel()
-        {
-            SetStatus(OrderStatus.Cancelled);
-        }
+        public void Deliver() => SetStatus(OrderStatus.Delivered);
+        public void WaitForRefund() => SetStatus(OrderStatus.WaitingForRefund);
+        public void Refund() => SetStatus(OrderStatus.Refunded);
+        public void MarkAsSuccess() => SetStatus(OrderStatus.Success);
+        public void MarkAsFailed() => SetStatus(OrderStatus.Failed);
+        public void Cancel() => SetStatus(OrderStatus.Cancelled);
     }
-
 }

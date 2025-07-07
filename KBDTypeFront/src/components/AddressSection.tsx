@@ -2,11 +2,14 @@
 import React, { useState, useEffect } from "react";
 import type { AddressDto } from "../dto/address/AddressDto";
 import {
-  getAddresses,
-  addAddress as apiAddAddress,
-  updateAddress as apiUpdateAddress,
-  removeAddress as apiRemoveAddress,
-} from "../api/Address";
+  useAddresses,
+  useSelectedAddressId,
+  useFetchAddresses,
+  useAddAddress,
+  useUpdateAddress,
+  useRemoveAddress,
+  useSelectAddress,
+} from "../hooks/useAddresses";
 import "../styles/AddressSection.css";
 
 // AddressCard — картка адреси
@@ -162,28 +165,22 @@ function AddressEditor({ address, onSave, onCancel }: AddressEditorProps) {
 
 // ======= АВТОНОМНИЙ AddressSection =======
 export default function AddressSection() {
-  const [addresses, setAddresses] = useState<AddressDto[]>([]);
-  const [selectedAddressId, setSelectedAddressId] = useState<number | null>(null);
-  const [showAddresses, setShowAddresses] = useState(true);
-  const [editingAddress, setEditingAddress] = useState<Partial<AddressDto> | null>(null);
-  const [loading, setLoading] = useState(false);
+  const addresses = useAddresses();
+  const selectedAddressId = useSelectedAddressId();
+  const fetchAddresses = useFetchAddresses();
+  const addAddress = useAddAddress();
+  const updateAddress = useUpdateAddress();
+  const removeAddress = useRemoveAddress();
+  const selectAddress = useSelectAddress();
 
-  // Завантажити адреси при монтуванні
   useEffect(() => {
-    loadAddresses();
-    // eslint-disable-next-line
-  }, []);
-
-  const loadAddresses = async () => {
-    setLoading(true);
-    try {
-      const data = await getAddresses();
-      setAddresses(data);
-      if (data.length > 0) setSelectedAddressId(data[0].id);
-    } finally {
-      setLoading(false);
+    if (!addresses.length) {
+      fetchAddresses();
     }
-  };
+  }, [addresses.length, fetchAddresses]);
+
+  const [editingAddress, setEditingAddress] = useState<Partial<AddressDto> | null>(null);
+  const [showAddresses, setShowAddresses] = useState(true);
 
   const handleAddAddress = () => {
     setEditingAddress({
@@ -202,26 +199,20 @@ export default function AddressSection() {
   };
 
   const handleDeleteAddress = async (id: number) => {
-    setLoading(true);
-    await apiRemoveAddress(id);
-    await loadAddresses();
-    setLoading(false);
+    await removeAddress(id);
   };
 
   const handleSave = async (address: Partial<AddressDto>) => {
-    setLoading(true);
     if (address.id) {
-      await apiUpdateAddress(address as AddressDto);
+      await updateAddress(address as AddressDto);
     } else {
-      await apiAddAddress(address as AddressDto);
+      await addAddress(address as AddressDto);
     }
     setEditingAddress(null);
-    await loadAddresses();
-    setLoading(false);
   };
 
   const handleSelect = (id: number) => {
-    setSelectedAddressId(id);
+    selectAddress(id);
   };
 
   return (
@@ -289,7 +280,6 @@ export default function AddressSection() {
           </div>
         ) : null
       )}
-      {loading && <div className="loading-overlay">Завантаження...</div>}
     </div>
   );
 }

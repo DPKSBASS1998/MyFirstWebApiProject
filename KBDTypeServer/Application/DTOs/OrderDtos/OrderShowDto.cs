@@ -17,7 +17,7 @@ namespace KBDTypeServer.Application.DTOs.OrderDtos
         public string? Apartment { get; set; }
         public string PostalCode { get; set; }
         public string? Comment { get; set; }
-        public List<OrderItem> Items { get; set; }
+        public List<OrderItemShowDto> Items { get; set; }
         public string? PaymentId { get; set; }
         public string? TrackingNumber { get; set; }
         public OrderStatus Status { get; set; }

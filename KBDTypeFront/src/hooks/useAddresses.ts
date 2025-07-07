@@ -8,6 +8,7 @@ import {
   removeAddressThunk,
   selectAddress,
 } from "../store/addressesSlice";
+import { useCallback } from "react";
 
 // Хук для отримання списку адрес
 export function useAddresses() {
@@ -15,8 +16,10 @@ export function useAddresses() {
 }
 
 export function useFetchAddresses() {
-  const dispatch: AppDispatch = useDispatch();
-  return () => dispatch(fetchAddresses());
+  const dispatch = useDispatch<AppDispatch>();
+  return useCallback(() => {
+    dispatch(fetchAddresses());
+  }, [dispatch]);
 }
 
 // Хук для додавання адреси

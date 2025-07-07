@@ -40,24 +40,19 @@ namespace KBDTypeServer.WebApi.Controllers
         }
         [HttpPost]
         [Authorize]
-        public async Task<ActionResult<OrderShowDto?>> Add(OrderCreateDto order, CancellationToken cancellationToken)
+        public async Task<ActionResult> Add(OrderCreateDto order, CancellationToken cancellationToken)
         {
-            if (order == null)
+            if (!ModelState.IsValid)
             {
-                return BadRequest("Order data is required.");
+                return BadRequest(ModelState);
             }
             var userId = GetСurrentUserId();
             if (userId == null)
             {
                 return Unauthorized("User ID is required to add an order.");
             }
-            var UserId = userId.Value; // Ensure the order is associated with the current user
-            var addedOrder = await _orderService.AddAsync(order, UserId, cancellationToken);
-            if (addedOrder == null)
-            {
-                return BadRequest("Failed to add the order.");
-            }
-            return addedOrder; 
+            await _orderService.AddAsync(order, userId.Value, cancellationToken);
+            return Ok();
         }
     }
 }

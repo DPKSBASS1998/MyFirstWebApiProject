@@ -13,14 +13,14 @@ namespace KBDTypeServer.Application.Services.ProductServices
             _productRepository = productRepository ?? throw new ArgumentNullException(nameof(productRepository));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
-        public async Task<List<ProductDto?>> GetAllProductsAsync(CancellationToken cancellationToken)
+        public async Task<List<ProductUniversalDto?>> GetAllProductsAsync(CancellationToken cancellationToken)
         {
             var result = await _productRepository.GetAllProductsAsync(cancellationToken);
             if (result == null || result.Count == 0)
             {
                 throw new KeyNotFoundException("No products found.");
             }
-            return _mapper.Map<List<ProductDto?>>(result);
+            return _mapper.Map<List<ProductUniversalDto?>>(result);
         }
 
         public Task<ProductDto?> GetProductByIdAsync(int productId, CancellationToken cancellationToken)

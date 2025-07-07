@@ -3,6 +3,7 @@ using KBDTypeServer.Domain.Factories;
 using Microsoft.EntityFrameworkCore;
 using KBDTypeServer.Domain.Entities.OrderEntity;
 
+
 namespace KBDTypeServer.Infrastructure.Repositories.OrderRepositories;
 public class OrderRepository : IOrderRepository
 {
@@ -32,12 +33,23 @@ public class OrderRepository : IOrderRepository
         _context.Orders.Remove(order);
         if (order == null)
         {
-            return false; // If the order is null, we cannot delete it
             throw new ArgumentNullException(nameof(order), "Order cannot be null");   
         }
         await _context.SaveChangesAsync(cancellationToken);
         return true;
         
+    }
+
+    public Task<Order?> GetByPaymentIntentIdAsync(string paymentIntentId, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(paymentIntentId))
+        {
+            throw new ArgumentException("Payment Intent ID cannot be null or empty", nameof(paymentIntentId));
+        }
+        return _context.Orders
+            .Include(o => o.Items)
+            .FirstOrDefaultAsync(o => o.PaymentId == paymentIntentId, cancellationToken)
+            ?? throw new KeyNotFoundException("Order with the specified Payment Intent ID not found");
     }
 
     public async Task<List<Order?>> GetAllByUserIdAsync(int userId,CancellationToken cancellationToken)
@@ -48,16 +60,19 @@ public class OrderRepository : IOrderRepository
         }
         return await _context.Orders
             .Where(o => o.UserId == userId)
-            .ToListAsync(cancellationToken);
+            .Include(o => o.Items)
+            .ThenInclude(item => item.Product)
+            .ToListAsync(cancellationToken)
+            ?? throw new KeyNotFoundException("No orders found for the specified user ID");
     }
 
+    // Приклад для OrderRepository.cs з використанням EF Core
     public async Task<Order?> GetByIdAsync(int id, CancellationToken cancellationToken)
     {
-        if (id <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(id), "Order ID must be greater than zero");
-        }
-        return await _context.Orders.FindAsync(new object[] { id }, cancellationToken).AsTask();
+        return await _context.Orders
+            .Include(o => o.Items) // Включаємо список товарів у замовленні
+            .ThenInclude(oi => oi.Product) // Для кожного товару включаємо сам продукт
+            .FirstOrDefaultAsync(o => o.Id == id, cancellationToken);
     }
 
     public async Task<Order?> UpdateAsync(Order order, CancellationToken cancellationToken)

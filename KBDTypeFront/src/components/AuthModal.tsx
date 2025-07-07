@@ -2,12 +2,12 @@
 import React, { useState } from "react";
 import { useLogin, useRegister } from "../hooks/useAuth";
 import type { LoginDto } from "../dto/auth/LoginDto";
-import type { RegisterDto } from "../dto/auth/RegistrationDto/";
+import type { RegistrationDto } from "../dto/auth/RegistrationDto";
 import "../styles/AuthModal.css";
 
 // Оновлені початкові стани згідно з DTO
 const initialLoginState: LoginDto = { identifier: "", password: "", rememberMe: false };
-const initialRegisterState: RegisterDto = {
+const initialRegisterState: RegistrationDto = {
   firstName: "",
   lastName: "",
   phoneNumber: "",
@@ -25,7 +25,7 @@ export default function AuthModal({ onClose }: AuthModalProps) {
   const login = useLogin();
   const register = useRegister();
   const [mode, setMode] = useState<Mode>("login");
-  const [form, setForm] = useState<LoginDto | (RegisterDto & { confirmPassword?: string })>(initialLoginState);
+  const [form, setForm] = useState<LoginDto | (RegistrationDto & { confirmPassword?: string })>(initialLoginState);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -43,7 +43,7 @@ export default function AuthModal({ onClose }: AuthModalProps) {
 
     try {
       if (mode === "register") {
-        const regForm = form as RegisterDto & { confirmPassword?: string };
+        const regForm = form as RegistrationDto & { confirmPassword?: string };
 
         const phoneRegex = /^380\d{9}$/;
         if (!phoneRegex.test(regForm.phoneNumber)) {
@@ -55,7 +55,7 @@ export default function AuthModal({ onClose }: AuthModalProps) {
 
         // Відправляємо тільки поля RegisterDto
         const { confirmPassword, ...registerDto } = regForm;
-        await register(registerDto as RegisterDto);
+        await register(registerDto as RegistrationDto);
       } else {
         const loginForm = form as LoginDto;
         await login(loginForm);
@@ -104,7 +104,7 @@ export default function AuthModal({ onClose }: AuthModalProps) {
                 name="firstName"
                 type="text"
                 placeholder="Ім'я"
-                value={(form as RegisterDto).firstName}
+                value={(form as RegistrationDto).firstName}
                 onChange={handleChange}
                 required
               />
@@ -112,7 +112,7 @@ export default function AuthModal({ onClose }: AuthModalProps) {
                 name="lastName"
                 type="text"
                 placeholder="Прізвище"
-                value={(form as RegisterDto).lastName}
+                value={(form as RegistrationDto).lastName}
                 onChange={handleChange}
                 required
               />
@@ -120,7 +120,7 @@ export default function AuthModal({ onClose }: AuthModalProps) {
                 name="phoneNumber"
                 type="tel"
                 placeholder="Телефон (380XXXXXXXXX)"
-                value={(form as RegisterDto).phoneNumber}
+                value={(form as RegistrationDto).phoneNumber}
                 onChange={handleChange}
                 required
               />
@@ -128,7 +128,7 @@ export default function AuthModal({ onClose }: AuthModalProps) {
                 name="email"
                 type="email"
                 placeholder="Email"
-                value={(form as RegisterDto).email ?? ""}
+                value={(form as RegistrationDto).email ?? ""}
                 onChange={handleChange}
               />
             </>
@@ -153,7 +153,7 @@ export default function AuthModal({ onClose }: AuthModalProps) {
               type={showPassword ? "text" : "password"}
               placeholder="Пароль"
               value={mode === "register"
-                ? (form as RegisterDto).password
+                ? (form as RegistrationDto).password
                 : (form as LoginDto).password}
               onChange={handleChange}
               required

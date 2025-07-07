@@ -15,10 +15,13 @@ export class OrderShowDto {
     items: {
         productId: number;
         quantity: number;
+        price: number;
+        productName: string | null; // Optional, can be null if product not found
+        imageUrl: string; // URL to the product image
     }[] = [];
     paymentId?: number;
     trackingNumber?: string;
-    status: string = '';
+    status: number = 0;
     subtotal: number = 0;
     totalPrice: number = 0;
     createdAt: Date = new Date();

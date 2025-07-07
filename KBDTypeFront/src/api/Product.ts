@@ -5,7 +5,7 @@ import type { SwitchFilterDto } from "../dto/SwitchFilterDto";
 // Вказати адресу до бекенду, якщо треба — змінити
 const API = "/api/product";
 
-export async function getProducts(): Promise<any[]> {
+export async function getAllProducts(): Promise<any[]> {
   const response = await axios.get<any[]>(`${API}`);
   return response.data;
 }

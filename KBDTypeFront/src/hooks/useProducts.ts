@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
-import { getProducts, filterProducts } from "../api/Product";
-import type { SwitchFilterDto } from "../dto/SwitchFilterDto";
+import { getAllProducts } from "../api/Product";
 import type { Switches } from "../models/Switches";
 
-export function useProducts(filter?: SwitchFilterDto) {
+export function useProducts() {
   const [products, setProducts] = useState<Switches[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -11,19 +10,14 @@ export function useProducts(filter?: SwitchFilterDto) {
     setLoading(true);
     const fetch = async () => {
       try {
-        let data;
-        if (filter) {
-          data = await filterProducts(filter);
-        } else {
-          data = await getProducts();
-        }
+        const data = await getAllProducts();
         setProducts(data);
       } finally {
         setLoading(false);
       }
     };
     fetch();
-  }, [JSON.stringify(filter)]);
+  }, []);
 
   return { products, loading };
 }

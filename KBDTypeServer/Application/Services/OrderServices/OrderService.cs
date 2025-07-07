@@ -2,6 +2,7 @@
 using KBDTypeServer.Domain.Factories;
 using KBDTypeServer.Application.DTOs.OrderDtos;
 using AutoMapper;
+using KBDTypeServer.Domain.Enums;
 using KBDTypeServer.Infrastructure.Repositories.OrderRepositories;
 using KBDTypeServer.Domain.ValueObjects;
 
@@ -16,7 +17,7 @@ namespace KBDTypeServer.Application.Services.OrderServices
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper), "Mapper cannot be null");
             _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository), "Order repository cannot be null");
         }
-        public async Task<OrderShowDto?> AddAsync(OrderCreateDto order, int userId, CancellationToken cancellationToken)
+        public async Task AddAsync(OrderCreateDto order, int userId, CancellationToken cancellationToken)
         {
             if (order == null)
             {
@@ -31,9 +32,17 @@ namespace KBDTypeServer.Application.Services.OrderServices
             {
                 throw new InvalidOperationException("Failed to map Order to OrderInitData");
             }
-            var newOrder = OrderFactory.CreateOrder(orderInitData, userId); 
-
-            return _mapper.Map<OrderShowDto>(await _orderRepository.AddAsync(newOrder, cancellationToken));
+            var newOrder = OrderFactory.CreateOrder(orderInitData, userId);
+            var result = await _orderRepository.AddAsync(newOrder, cancellationToken);
+            if (result == null)
+            {
+                throw new InvalidOperationException("Failed to add order to the repository");
+            }
+            if (result.Id <= 0)
+            {
+                throw new InvalidOperationException("Order ID must be greater than zero after adding to the repository");
+            }
+            result.SetStatus(OrderStatus.WaitingForPayment);
         }
 
         public Task<bool> DeleteAsync(OrderShowDto order, CancellationToken cancellationToken)
@@ -52,6 +61,7 @@ namespace KBDTypeServer.Application.Services.OrderServices
             {
                 throw new InvalidOperationException("No orders found for the specified user ID");
             }
+            
             return _mapper.Map<List<OrderShowDto>>(orders);
 
         }

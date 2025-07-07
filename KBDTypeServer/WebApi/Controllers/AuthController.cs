@@ -22,7 +22,7 @@ namespace KBDTypeServer.WebApi.Controllers
             _authService = authService ?? throw new ArgumentNullException(nameof(authService));
         }
 
-        [HttpGet("O")]
+        [HttpGet("me")]
         [Authorize]
         public async Task<IActionResult> Get()
         {

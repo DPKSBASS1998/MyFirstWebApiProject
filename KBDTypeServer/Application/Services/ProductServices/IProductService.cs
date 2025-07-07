@@ -7,7 +7,7 @@ namespace KBDTypeServer.Application.Services.ProductServices
         
         Task<ProductDto?> GetProductByIdAsync(int productId, CancellationToken cancellationToken);
   
-        Task<List<ProductDto?>> GetAllProductsAsync(CancellationToken cancellationToken);
+        Task<List<ProductUniversalDto?>> GetAllProductsAsync(CancellationToken cancellationToken);
 
         Task<List<ProductDto?>> GetWithFilterAsync(ProductFilterDto productFilterDto, CancellationToken cancellationToken);
 

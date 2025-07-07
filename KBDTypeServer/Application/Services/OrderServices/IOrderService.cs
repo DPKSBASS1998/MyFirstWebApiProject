@@ -24,8 +24,9 @@ namespace KBDTypeServer.Application.Services.OrderServices
         /// </summary>
         /// <param name="order">The order to add.</param>
         /// <param name="cancellationToken">Cancellation token for async operations.</param>
+        /// <param name="userId">The ID of the user adding the order.</param>
         /// <returns>The added order.</returns>
-        Task<OrderShowDto?> AddAsync(OrderCreateDto order, int userId, CancellationToken cancellationToken);
+        Task AddAsync(OrderCreateDto order, int userId, CancellationToken cancellationToken);
         /// <summary>
         /// Updates an existing order.
         /// </summary>

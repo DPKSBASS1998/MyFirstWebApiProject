@@ -9,6 +9,7 @@ import MyAccount from "./pages/MyAccount";
 import Catalog from "./pages/Catalog";
 import { fetchMe } from "./store/authSlice";
 import Checkout from "./pages/Checkout";
+import Orders from "./pages/Orders";
 
 const router = createBrowserRouter([
   {
@@ -19,6 +20,7 @@ const router = createBrowserRouter([
       { path: "my-account", element: <MyAccount /> },
       { path: "catalog", element: <Catalog /> },
       { path: "checkout", element: <Checkout /> },
+      { path: "*", element: <Orders />},
     ],
   },
 ]);

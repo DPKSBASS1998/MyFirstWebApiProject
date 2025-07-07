@@ -101,26 +101,6 @@ export default function ProfileForm() {
               readOnly={readOnly}
             />
           </label>
-          <label>
-            Стать
-            <input
-              name="gender"
-              value={form.gender ?? ""}
-              onChange={handleChange}
-              readOnly={readOnly}
-            />
-          </label>
-          <label>
-            Дата народження
-            <input
-              name="dateOfBirth"
-              type="date"
-              value={form.dateOfBirth ?? ""}
-              onChange={handleChange}
-              readOnly={readOnly}
-            />
-          </label>
-
           {message && (
             <div className={message.includes("помилка") ? "form-error" : "form-message"}>
               {message}
