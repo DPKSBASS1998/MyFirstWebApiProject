@@ -1,0 +1,196 @@
+.orders-page {
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 20px;
+  font-family: sans-serif;
+}
+
+.orders-page h1 {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.orders-status {
+  text-align: center;
+  font-size: 1.2em;
+  color: #666;
+  margin-top: 50px;
+}
+
+.orders-status.error {
+  color: #d9534f;
+}
+
+.order-card {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 25px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.order-card-header {
+  display: grid;
+  /* 2. Визначаємо колонки:
+     - 1fr: перша колонка (order-meta) займає весь доступний простір.
+     - auto: друга колонка (order-status) займає стільки місця, скільки їй потрібно.
+  */
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 15px;
+  margin-bottom: 15px;
+}
+
+.order-card-header h2 {
+  margin: 0;
+  font-size: 1.5em;
+}
+
+
+
+.order-status {
+  font-weight: bold;
+  padding: 5px 10px;
+  border-radius: 5px;
+  background-color: #e7e7e7;
+}
+
+.order-card-body {
+  display: grid;
+  /* Дві колонки, які займають однакову ширину */
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+/* Прибираємо маркери зі старого списку, якщо він десь залишився */
+.order-section ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+/* Нові стилі для списку товарів */
+.items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* Відстань між товарами */
+}
+
+.order-item {
+  display: grid;
+  /* Дві колонки: одна для картинки (60px), інша для тексту (займає решту місця) */
+  grid-template-columns: 60px 1fr;
+  gap: 15px; /* Відстань між картинкою і текстом */
+  align-items: center;
+  background-color: #fff;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #e7e7e7;
+}
+
+.order-item-image img {
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
+  display: block;
+}
+
+.order-item-details {
+  display: flex;
+  flex-direction: column; /* Розташовуємо ID, назву і кількість один під одним */
+}
+
+.order-item-details span {
+  line-height: 1.4;
+}
+
+.item-id {
+  font-size: 0.8em;
+  color: #888;
+}
+
+.item-name {
+  font-weight: bold;
+}
+
+.item-quantity {
+  font-size: 0.9em;
+  color: #555;
+}
+
+.order-card-footer {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.order-total {
+  font-size: 1.2em;
+}
+
+.order-actions {
+  display: flex;
+  gap: 10px; /* Додаємо відстань між кнопками */
+}
+
+.pay-button {
+  background-color: #5cb85c; /* Зелений колір для оплати */
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.pay-button:hover {
+  background-color: #4cae4c;
+}
+
+.cancel-button {
+  background-color: #d9534f;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.cancel-button:hover {
+  background-color: #c9302c;
+}
+
+/* Стан для заблокованих кнопок */
+.pay-button:disabled,
+.cancel-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* Нові стилі для блоку з деталями отримувача */
+.recipient-details {
+  display: grid;
+  /* Дві колонки: перша (назви) автоматично підлаштовується під контент,
+     друга (значення) займає весь вільний простір. */
+  grid-template-columns: auto 1fr;
+  /* Відступи: 8px між рядками, 15px між колонками */
+  gap: 8px 15px;
+  align-items: start; /* Вирівнюємо по верхньому краю, корисно для довгих адрес */
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 15px;
+}
+
+/* Стилізуємо назви полів (кожен непарний елемент у гріди) */
+.recipient-details span:nth-child(odd) {
+  font-weight: bold;
+  color: #555;
+}
