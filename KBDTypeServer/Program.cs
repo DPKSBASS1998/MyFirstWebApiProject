@@ -2,7 +2,6 @@ using KBDTypeServer.Application;
 using KBDTypeServer.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.FileProviders;
 using System.Text.Json;
 using KBDTypeServer.Infrastructure.Repositories.OrderRepositories;
 using KBDTypeServer.Infrastructure.Repositories.ProductRepositories;
@@ -10,7 +9,6 @@ using KBDTypeServer.Infrastructure.Repositories.UserRepositories;
 using KBDTypeServer.Infrastructure.Repositories.AddressesRepositories;
 using KBDTypeServer.Infrastructure.Repositories.CartItemRepositories;
 using KBDTypeServer.Infrastructure.Repositories.WishListRepositories;
-
 using KBDTypeServer.Application.Services.AuthServices;
 using KBDTypeServer.Application.Services.UserServices;
 using KBDTypeServer.Application.Services.AddressService;
@@ -18,26 +16,27 @@ using KBDTypeServer.Application.Services.OrderServices;
 using KBDTypeServer.Application.Services.PaymentService;
 using KBDTypeServer.Application.Services.ProductServices;
 using KBDTypeServer.Domain.Entities.UserEntity;
-using KBDTypeServer.Application.Mapping;
 using KBDTypeServer.Application.Services.ElitApiServices;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ��������� ��������� ���� �����
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+// Configure NEW database connection
 
-// ���� ������
+builder.Services.AddDbContext<ApplicationDbContext>(
+    options => options.UseNpgsql(builder.Configuration.GetConnectionString("AWSConnection")));
+
+// Add controllers
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-    }); ;
+    });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 /// <summary>
-/// <!-- ��������� ������ -->-->
+/// <!-- Service Registration -->-->
 /// </summary>
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserProfileService, UserProfileService>();
@@ -49,7 +48,7 @@ builder.Services.AddScoped<IElitApiService, ElitApiService>();
 
 
 /// <summary>
-/// <!-- ��������� ���������� -->-->
+/// <!-- Repository Registration -->-->
 /// </summary>
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
@@ -59,41 +58,43 @@ builder.Services.AddScoped<ICartItemRepository, CartItemRepository>();
 builder.Services.AddScoped<IWishListRepository, WishListRepository>();
 
 /// <summary>
-/// <!-- ��������� AutoMapper -->-->
+/// <!-- AutoMapper Configuration -->-->
 /// </summary>
 builder.Services.AddAutoMapper(typeof(KBDTypeServer.Application.Mapping.MappingProfile));
 
 
 /// <summary>
-/// ������������ Identity
+/// Identity password Configuration
 /// </summary>
 builder.Services.AddIdentity<User, IdentityRole<int>>(options =>
 {
-    options.Password.RequireDigit = false;
-    options.Password.RequiredLength = 1;
-    options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequireUppercase = false;
-    options.Password.RequireLowercase = false;
-    options.Password.RequiredUniqueChars = 0;
+    // Password configuration
+    if (builder.Environment.IsDevelopment())
+    {
+        // Development: weak password policy for easier testing
+        options.Password.RequireDigit = false;
+        options.Password.RequiredLength = 1;
+        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequireUppercase = false;
+        options.Password.RequireLowercase = false;
+        options.Password.RequiredUniqueChars = 0;
+    }
+    else
+    {
+        // Production: strong password policy for security
+        options.Password.RequireDigit = true;
+        options.Password.RequiredLength = 8;
+        options.Password.RequireNonAlphanumeric = true;
+        options.Password.RequireUppercase = true;
+        options.Password.RequireLowercase = true;
+        options.Password.RequiredUniqueChars = 2;
+    }
 })
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
 
 /// <summary>
-/// ������������ CORS
-/// </summary>
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowFrontend",
-        policy => policy
-            .WithOrigins("http://localhost:3000")
-            .AllowAnyMethod()
-            .AllowAnyHeader()
-            .AllowCredentials());
-});
-
-/// <summary>
-/// ������������ ��� ��� ��������������
+/// Cookie Policy Configuration
 /// </summary>
 builder.Services.ConfigureApplicationCookie(options =>
 {
@@ -104,18 +105,25 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 var app = builder.Build();
 
+
+// Enable Swagger UI only in development for API documentation/testing
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
+// Enforce HTTPS for all requests
 app.UseHttpsRedirection();
-app.UseCors("AllowFrontend");
+
+// Enable authentication and authorization middleware
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Map controller endpoints
 app.MapControllers();
 
+// Serve static files and fallback to index.html in production (for SPA)
 if (app.Environment.IsProduction())
 {
     app.UseDefaultFiles();
