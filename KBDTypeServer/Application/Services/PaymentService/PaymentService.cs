@@ -88,7 +88,7 @@ public class PaymentService : IPaymentService
         // Вона захищає від повторної обробки вже оплаченого замовлення.
         if (order != null && order.Status != OrderStatus.Paid)
         {
-            order.Pay();
+            order.SetStatus(OrderStatus.Paid);
             await _orderRepository.UpdateAsync(order, new CancellationToken());
         }
     }
