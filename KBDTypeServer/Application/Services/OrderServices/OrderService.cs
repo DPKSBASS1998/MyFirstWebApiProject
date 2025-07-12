@@ -43,6 +43,7 @@ namespace KBDTypeServer.Application.Services.OrderServices
                 throw new InvalidOperationException("Order ID must be greater than zero after adding to the repository");
             }
             result.SetStatus(OrderStatus.WaitingForPayment);
+            _orderRepository.UpdateAsync(result, new CancellationToken());
         }
 
         public Task<bool> DeleteAsync(OrderShowDto order, CancellationToken cancellationToken)
